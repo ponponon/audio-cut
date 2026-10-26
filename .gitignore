@@ -1,0 +1,33 @@
+# Flutter/Dart
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+build/
+coverage/
+**/.gradle/
+**/local.properties
+
+# Android/Gradle
+.gradle/
+local.properties
+**/GeneratedPluginRegistrant.java
+
+# iOS/Xcode
+Pods/
+DerivedData/
+*.xcuserstate
+*.mode1v3
+*.mode2v3
+*.perspectivev3
+xcuserdata/
+*.iml
+
+# Editors and OS files
+.idea/
+.vscode/
+.DS_Store
+
+# User-provided test media and temporary toolchains
+assets/test_cut.mp3
+.tooling/

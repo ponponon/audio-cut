@@ -1,0 +1,319 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-26T03:16:03Z",
+  "title": "Design System: 本地音剪",
+  "extensions": {
+    "colorMeta": {
+      "primary": {
+        "role": "primary",
+        "displayName": "Voice Memo Coral",
+        "canonical": "#C64025",
+        "tonalRamp": [
+          "#360000",
+          "#580000",
+          "#7A0000",
+          "#9C0F00",
+          "#BF391E",
+          "#E25A3F",
+          "#FF8164",
+          "#FFBC9C"
+        ]
+      },
+      "primary-dark": {
+        "role": "primary",
+        "displayName": "Voice Memo Coral — Dark",
+        "canonical": "#FF896B",
+        "tonalRamp": [
+          "#310000",
+          "#510000",
+          "#720000",
+          "#932604",
+          "#B5462A",
+          "#D76549",
+          "#FF8B6D",
+          "#FFC5A5"
+        ]
+      },
+      "canvas-light": {
+        "role": "neutral",
+        "displayName": "System Canvas — Light",
+        "canonical": "#F2F2F7",
+        "tonalRamp": [
+          "#09090C",
+          "#1F1F22",
+          "#37373B",
+          "#525256",
+          "#6E6E72",
+          "#8C8C90",
+          "#B0B0B5",
+          "#EBEBEF"
+        ]
+      },
+      "canvas-dark": {
+        "role": "neutral",
+        "displayName": "System Canvas — Dark",
+        "canonical": "#000000",
+        "tonalRamp": [
+          "#090909",
+          "#1F1F1F",
+          "#383838",
+          "#525252",
+          "#6F6F6F",
+          "#8C8C8C",
+          "#B1B1B1",
+          "#EBEBEB"
+        ]
+      },
+      "surface-light": {
+        "role": "neutral",
+        "displayName": "Content Surface — Light",
+        "canonical": "#FFFFFF",
+        "tonalRamp": [
+          "#090909",
+          "#1F1F1F",
+          "#383838",
+          "#525252",
+          "#6F6F6F",
+          "#8C8C8C",
+          "#B1B1B1",
+          "#EBEBEB"
+        ]
+      },
+      "surface-dark": {
+        "role": "neutral",
+        "displayName": "Content Surface — Dark",
+        "canonical": "#1C1C1E",
+        "tonalRamp": [
+          "#09090B",
+          "#1F1F21",
+          "#38383A",
+          "#525255",
+          "#6E6E71",
+          "#8C8C8E",
+          "#B1B1B3",
+          "#EBEBEE"
+        ]
+      },
+      "surface-secondary-light": {
+        "role": "neutral",
+        "displayName": "Secondary Surface — Light",
+        "canonical": "#E5E5EA",
+        "tonalRamp": [
+          "#09090C",
+          "#1F1F22",
+          "#37373B",
+          "#525256",
+          "#6E6E72",
+          "#8C8C90",
+          "#B0B0B5",
+          "#EBEBF0"
+        ]
+      },
+      "surface-secondary-dark": {
+        "role": "neutral",
+        "displayName": "Secondary Surface — Dark",
+        "canonical": "#2C2C2E",
+        "tonalRamp": [
+          "#09090B",
+          "#1F1F21",
+          "#38383A",
+          "#525254",
+          "#6E6E71",
+          "#8C8C8E",
+          "#B1B1B3",
+          "#EBEBED"
+        ]
+      },
+      "ink-light": {
+        "role": "neutral",
+        "displayName": "Primary Ink — Light",
+        "canonical": "#1C1C1E",
+        "tonalRamp": [
+          "#09090B",
+          "#1F1F21",
+          "#38383A",
+          "#525255",
+          "#6E6E71",
+          "#8C8C8E",
+          "#B1B1B3",
+          "#EBEBEE"
+        ]
+      },
+      "ink-dark": {
+        "role": "neutral",
+        "displayName": "Primary Ink — Dark",
+        "canonical": "#F5F5F7",
+        "tonalRamp": [
+          "#09090A",
+          "#1F1F20",
+          "#383839",
+          "#525254",
+          "#6E6E70",
+          "#8C8C8E",
+          "#B1B1B3",
+          "#EBEBED"
+        ]
+      },
+      "secondary-ink-light": {
+        "role": "neutral",
+        "displayName": "Secondary Ink — Light",
+        "canonical": "#636366",
+        "tonalRamp": [
+          "#09090B",
+          "#1F1F21",
+          "#38383A",
+          "#525255",
+          "#6E6E71",
+          "#8C8C8F",
+          "#B1B1B4",
+          "#EBEBEE"
+        ]
+      },
+      "secondary-ink-dark": {
+        "role": "neutral",
+        "displayName": "Secondary Ink — Dark",
+        "canonical": "#AEAEB2",
+        "tonalRamp": [
+          "#09090B",
+          "#1F1F22",
+          "#38383B",
+          "#525256",
+          "#6E6E72",
+          "#8C8C8F",
+          "#B0B0B5",
+          "#EBEBEF"
+        ]
+      },
+      "separator-light": {
+        "role": "neutral",
+        "displayName": "Separator — Light",
+        "canonical": "#D1D1D6",
+        "tonalRamp": [
+          "#09090C",
+          "#1F1F22",
+          "#37373B",
+          "#525256",
+          "#6E6E73",
+          "#8C8C90",
+          "#B0B0B5",
+          "#EAEAF0"
+        ]
+      },
+      "separator-dark": {
+        "role": "neutral",
+        "displayName": "Separator — Dark",
+        "canonical": "#38383A",
+        "tonalRamp": [
+          "#09090A",
+          "#1F1F21",
+          "#38383A",
+          "#525254",
+          "#6E6E71",
+          "#8C8C8E",
+          "#B1B1B3",
+          "#EBEBED"
+        ]
+      },
+      "waveform-track-light": {
+        "role": "neutral",
+        "displayName": "Waveform Track — Light",
+        "canonical": "#F7F7F9",
+        "tonalRamp": [
+          "#09090A",
+          "#1F1F20",
+          "#383839",
+          "#525254",
+          "#6E6E70",
+          "#8C8C8E",
+          "#B1B1B3",
+          "#EBEBED"
+        ]
+      },
+      "waveform-track-dark": {
+        "role": "neutral",
+        "displayName": "Waveform Track — Dark",
+        "canonical": "#121214",
+        "tonalRamp": [
+          "#09090B",
+          "#1F1F21",
+          "#38383A",
+          "#525255",
+          "#6E6E71",
+          "#8C8C8E",
+          "#B1B1B3",
+          "#EBEBEE"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Short empty-state headline; follows system text scaling."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Audio filename and editor section titles."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Instructions and supporting information."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Format, duration, and field labels."
+      }
+    },
+    "elevation": {
+      "strategy": "Flat surfaces. Separate areas through system canvas, content surfaces, and thin dividers; no static shadows."
+    },
+    "motion": {
+      "principle": "Use motion only for state changes and native modal transitions. Avoid decorative animation."
+    },
+    "layout": {
+      "timeControls": "Keep start and end fields inline at normal text size and width; stack them when text scale exceeds 1.2 or available width is below 350dp.",
+      "safeArea": "Keep the export action inside the bottom safe area."
+    },
+    "narrative": {
+      "northStar": "安静的私人剪辑台",
+      "overview": "参考 iOS「语音备忘录」的熟悉工具感。系统字体、少量表面层级和珊瑚色选区把注意力放在波形、起止时间、试听和导出。",
+      "keyCharacteristics": [
+        "跟随系统浅色和深色外观。",
+        "波形和剪辑范围优先呈现。",
+        "支持系统动态字号和清晰对比。",
+        "本机隐私说明简短可见。"
+      ],
+      "rules": [
+        {
+          "name": "Quiet Utility",
+          "section": "Overview",
+          "body": "用户第一眼找到波形、起止时间和导出操作；不先读宣传文案。"
+        },
+        {
+          "name": "One Accent",
+          "section": "Colors",
+          "body": "珊瑚色只表示主要操作、选区和播放进度。"
+        },
+        {
+          "name": "System Type",
+          "section": "Typography",
+          "body": "遵循系统字号缩放；大字号下时间控件纵向排列。"
+        },
+        {
+          "name": "Flat Surface",
+          "section": "Elevation",
+          "body": "通过中性色表面和分隔线建立层次，不堆叠容器或静态阴影。"
+        }
+      ],
+      "dos": [
+        "让波形、起止时间和试听成为编辑页的视觉中心。",
+        "支持动态字号、可读对比度和足够大的触控区域。",
+        "跟随系统浅色与深色外观。"
+      ],
+      "donts": [
+        "复刻旧版近黑背景、薄荷绿大按钮、多层大圆角卡片和口号式大标题。",
+        "堆叠大卡片或加入与剪辑无关的装饰。",
+        "增加登录、自动同步、上传或远程分析入口。"
+      ]
+    }
+  }
+}
