@@ -6,62 +6,62 @@
     "colorMeta": {
       "primary": {
         "role": "primary",
-        "displayName": "Voice Memo Coral",
-        "canonical": "#C64025",
+        "displayName": "WeChat-Inspired Forest Green",
+        "canonical": "#167A4B",
         "tonalRamp": [
-          "#360000",
-          "#580000",
-          "#7A0000",
-          "#9C0F00",
-          "#BF391E",
-          "#E25A3F",
-          "#FF8164",
-          "#FFBC9C"
+          "#062215",
+          "#0B3F27",
+          "#115D39",
+          "#167A4B",
+          "#5CA281",
+          "#98C4B0",
+          "#D0E4DB",
+          "#FFFFFF"
         ]
       },
       "primary-dark": {
         "role": "primary",
-        "displayName": "Voice Memo Coral — Dark",
-        "canonical": "#FF896B",
+        "displayName": "Forest Green — Dark",
+        "canonical": "#63CC90",
         "tonalRamp": [
-          "#310000",
-          "#510000",
-          "#720000",
-          "#932604",
-          "#B5462A",
-          "#D76549",
-          "#FF8B6D",
-          "#FFC5A5"
+          "#1C3928",
+          "#336A4B",
+          "#4B9B6D",
+          "#63CC90",
+          "#92DBB1",
+          "#BAE9CE",
+          "#E0F5E9",
+          "#FFFFFF"
         ]
       },
       "canvas-light": {
         "role": "neutral",
-        "displayName": "System Canvas — Light",
-        "canonical": "#F2F2F7",
+        "displayName": "Calm Canvas — Light",
+        "canonical": "#F4F7F4",
         "tonalRamp": [
-          "#09090C",
-          "#1F1F22",
-          "#37373B",
-          "#525256",
-          "#6E6E72",
-          "#8C8C90",
-          "#B0B0B5",
-          "#EBEBEF"
+          "#444544",
+          "#7F807F",
+          "#B9BCB9",
+          "#F4F7F4",
+          "#F7F9F7",
+          "#FAFBFA",
+          "#FDFDFD",
+          "#FFFFFF"
         ]
       },
       "canvas-dark": {
         "role": "neutral",
-        "displayName": "System Canvas — Dark",
-        "canonical": "#000000",
+        "displayName": "Calm Canvas — Dark",
+        "canonical": "#0D1510",
         "tonalRamp": [
-          "#090909",
-          "#1F1F1F",
-          "#383838",
-          "#525252",
-          "#6F6F6F",
-          "#8C8C8C",
-          "#B1B1B1",
-          "#EBEBEB"
+          "#040604",
+          "#070B08",
+          "#0A100C",
+          "#0D1510",
+          "#565B58",
+          "#959896",
+          "#CFD0CF",
+          "#FFFFFF"
         ]
       },
       "surface-light": {
@@ -69,179 +69,209 @@
         "displayName": "Content Surface — Light",
         "canonical": "#FFFFFF",
         "tonalRamp": [
-          "#090909",
-          "#1F1F1F",
-          "#383838",
-          "#525252",
-          "#6F6F6F",
-          "#8C8C8C",
-          "#B1B1B1",
-          "#EBEBEB"
+          "#474747",
+          "#858585",
+          "#C2C2C2",
+          "#FFFFFF",
+          "#FFFFFF",
+          "#FFFFFF",
+          "#FFFFFF",
+          "#FFFFFF"
         ]
       },
       "surface-dark": {
         "role": "neutral",
         "displayName": "Content Surface — Dark",
-        "canonical": "#1C1C1E",
+        "canonical": "#19221B",
         "tonalRamp": [
-          "#09090B",
-          "#1F1F21",
-          "#38383A",
-          "#525255",
-          "#6E6E71",
-          "#8C8C8E",
-          "#B1B1B3",
-          "#EBEBEE"
+          "#070A08",
+          "#0D120E",
+          "#131A15",
+          "#19221B",
+          "#5E645F",
+          "#9A9E9B",
+          "#D1D3D1",
+          "#FFFFFF"
         ]
       },
       "surface-secondary-light": {
         "role": "neutral",
         "displayName": "Secondary Surface — Light",
-        "canonical": "#E5E5EA",
+        "canonical": "#E6EFE7",
         "tonalRamp": [
-          "#09090C",
-          "#1F1F22",
-          "#37373B",
-          "#525256",
-          "#6E6E72",
-          "#8C8C90",
-          "#B0B0B5",
-          "#EBEBF0"
+          "#404341",
+          "#787C78",
+          "#AFB6B0",
+          "#E6EFE7",
+          "#EEF4EE",
+          "#F4F8F4",
+          "#FAFCFA",
+          "#FFFFFF"
         ]
       },
       "surface-secondary-dark": {
         "role": "neutral",
         "displayName": "Secondary Surface — Dark",
-        "canonical": "#2C2C2E",
+        "canonical": "#253128",
         "tonalRamp": [
-          "#09090B",
-          "#1F1F21",
-          "#38383A",
-          "#525254",
-          "#6E6E71",
-          "#8C8C8E",
-          "#B1B1B3",
-          "#EBEBED"
+          "#0A0E0B",
+          "#131915",
+          "#1C251E",
+          "#253128",
+          "#666F68",
+          "#9FA4A0",
+          "#D3D6D4",
+          "#FFFFFF"
         ]
       },
       "ink-light": {
         "role": "neutral",
         "displayName": "Primary Ink — Light",
-        "canonical": "#1C1C1E",
+        "canonical": "#1C271F",
         "tonalRamp": [
-          "#09090B",
-          "#1F1F21",
-          "#38383A",
-          "#525255",
-          "#6E6E71",
-          "#8C8C8E",
-          "#B1B1B3",
-          "#EBEBEE"
+          "#080B09",
+          "#0F1410",
+          "#151E18",
+          "#1C271F",
+          "#606862",
+          "#9BA09C",
+          "#D2D4D2",
+          "#FFFFFF"
         ]
       },
       "ink-dark": {
         "role": "neutral",
         "displayName": "Primary Ink — Dark",
-        "canonical": "#F5F5F7",
+        "canonical": "#EEF5EF",
         "tonalRamp": [
-          "#09090A",
-          "#1F1F20",
-          "#383839",
-          "#525254",
-          "#6E6E70",
-          "#8C8C8E",
-          "#B1B1B3",
-          "#EBEBED"
+          "#434543",
+          "#7C7F7C",
+          "#B5BAB6",
+          "#EEF5EF",
+          "#F3F8F4",
+          "#F8FBF8",
+          "#FCFDFC",
+          "#FFFFFF"
         ]
       },
       "secondary-ink-light": {
         "role": "neutral",
         "displayName": "Secondary Ink — Light",
-        "canonical": "#636366",
+        "canonical": "#58675C",
         "tonalRamp": [
-          "#09090B",
-          "#1F1F21",
-          "#38383A",
-          "#525255",
-          "#6E6E71",
-          "#8C8C8F",
-          "#B1B1B4",
-          "#EBEBEE"
+          "#191D1A",
+          "#2E3630",
+          "#434E46",
+          "#58675C",
+          "#8A958D",
+          "#B6BCB7",
+          "#DEE1DE",
+          "#FFFFFF"
         ]
       },
       "secondary-ink-dark": {
         "role": "neutral",
         "displayName": "Secondary Ink — Dark",
-        "canonical": "#AEAEB2",
+        "canonical": "#A8B7AB",
         "tonalRamp": [
-          "#09090B",
-          "#1F1F22",
-          "#38383B",
-          "#525256",
-          "#6E6E72",
-          "#8C8C8F",
-          "#B0B0B5",
-          "#EBEBEF"
+          "#2F3330",
+          "#575F59",
+          "#808B82",
+          "#A8B7AB",
+          "#C2CDC4",
+          "#D9DFDA",
+          "#EEF1EE",
+          "#FFFFFF"
         ]
       },
       "separator-light": {
         "role": "neutral",
         "displayName": "Separator — Light",
-        "canonical": "#D1D1D6",
+        "canonical": "#D0DBD2",
         "tonalRamp": [
-          "#09090C",
-          "#1F1F22",
-          "#37373B",
-          "#525256",
-          "#6E6E73",
-          "#8C8C90",
-          "#B0B0B5",
-          "#EAEAF0"
+          "#3A3D3B",
+          "#6C726D",
+          "#9EA6A0",
+          "#D0DBD2",
+          "#DEE6E0",
+          "#EAEFEB",
+          "#F6F8F6",
+          "#FFFFFF"
         ]
       },
       "separator-dark": {
         "role": "neutral",
         "displayName": "Separator — Dark",
-        "canonical": "#38383A",
+        "canonical": "#3A493E",
         "tonalRamp": [
-          "#09090A",
-          "#1F1F21",
-          "#38383A",
-          "#525254",
-          "#6E6E71",
-          "#8C8C8E",
-          "#B1B1B3",
-          "#EBEBED"
+          "#101411",
+          "#1E2620",
+          "#2C372F",
+          "#3A493E",
+          "#758078",
+          "#A8AFAA",
+          "#D8DBD8",
+          "#FFFFFF"
         ]
       },
       "waveform-track-light": {
         "role": "neutral",
         "displayName": "Waveform Track — Light",
-        "canonical": "#F7F7F9",
+        "canonical": "#F2F7F3",
         "tonalRamp": [
-          "#09090A",
-          "#1F1F20",
-          "#383839",
-          "#525254",
-          "#6E6E70",
-          "#8C8C8E",
-          "#B1B1B3",
-          "#EBEBED"
+          "#444544",
+          "#7E807E",
+          "#B8BCB9",
+          "#F2F7F3",
+          "#F6F9F7",
+          "#F9FBFA",
+          "#FCFDFD",
+          "#FFFFFF"
         ]
       },
       "waveform-track-dark": {
         "role": "neutral",
         "displayName": "Waveform Track — Dark",
-        "canonical": "#121214",
+        "canonical": "#111A14",
         "tonalRamp": [
-          "#09090B",
-          "#1F1F21",
-          "#38383A",
-          "#525255",
-          "#6E6E71",
-          "#8C8C8E",
-          "#B1B1B3",
-          "#EBEBEE"
+          "#050706",
+          "#090E0A",
+          "#0D140F",
+          "#111A14",
+          "#585F5A",
+          "#969A98",
+          "#CFD1D0",
+          "#FFFFFF"
+        ]
+      },
+      "glass-surface-light": {
+        "role": "neutral",
+        "displayName": "Glass Surface — Light (91% opacity)",
+        "canonical": "#FFFFFF",
+        "tonalRamp": [
+          "#474747",
+          "#858585",
+          "#C2C2C2",
+          "#FFFFFF",
+          "#FFFFFF",
+          "#FFFFFF",
+          "#FFFFFF",
+          "#FFFFFF"
+        ]
+      },
+      "glass-surface-dark": {
+        "role": "neutral",
+        "displayName": "Glass Surface — Dark (85% opacity)",
+        "canonical": "#151E18",
+        "tonalRamp": [
+          "#060807",
+          "#0B100C",
+          "#101712",
+          "#151E18",
+          "#5B625D",
+          "#989C99",
+          "#D0D2D1",
+          "#FFFFFF"
         ]
       }
     },
@@ -264,21 +294,23 @@
       }
     },
     "elevation": {
-      "strategy": "Flat surfaces. Separate areas through system canvas, content surfaces, and thin dividers; no static shadows."
+      "strategy": "Use one clipped 14dp backdrop blur inside a 22dp rounded floating export surface with a translucent tint and thin edge; keep other surfaces flat to preserve clarity and limit compositing cost."
     },
     "motion": {
       "principle": "Use motion only for state changes and native modal transitions. Avoid decorative animation."
     },
     "layout": {
       "timeControls": "Keep start and end fields inline at normal text size and width; stack them when text scale exceeds 1.2 or available width is below 350dp.",
-      "safeArea": "Keep the export action inside the bottom safe area."
+      "safeArea": "Keep the 22dp rounded glass export action inside the bottom safe area; extend editor content behind it and leave enough scroll padding for the footer."
     },
     "narrative": {
       "northStar": "安静的私人剪辑台",
-      "overview": "参考 iOS「语音备忘录」的熟悉工具感。系统字体、少量表面层级和珊瑚色选区把注意力放在波形、起止时间、试听和导出。",
+      "overview": "参考 iOS「语音备忘录」的熟悉工具感。系统字体、柔和森林绿和少量表面层级把注意力放在波形、起止时间、试听和导出；底部导出操作以悬浮圆角胶囊和一层模糊半透明呈现轻量玻璃感。",
       "keyCharacteristics": [
         "跟随系统浅色和深色外观。",
         "波形和剪辑范围优先呈现。",
+        "使用柔和的微信绿系森林绿，并保持按钮文字对比。",
+        "只在底部导出栏使用轻量模糊玻璃效果。",
         "支持系统动态字号和清晰对比。",
         "本机隐私说明简短可见。"
       ],
@@ -291,7 +323,7 @@
         {
           "name": "One Accent",
           "section": "Colors",
-          "body": "珊瑚色只表示主要操作、选区和播放进度。"
+          "body": "森林绿只表示主要操作、选区和播放进度。"
         },
         {
           "name": "System Type",
@@ -301,17 +333,24 @@
         {
           "name": "Flat Surface",
           "section": "Elevation",
-          "body": "通过中性色表面和分隔线建立层次，不堆叠容器或静态阴影。"
+          "body": "通过中性色表面和分隔线建立层次；玻璃模糊只出现在底部导出栏。"
+        },
+        {
+          "name": "Single Glass",
+          "section": "Elevation",
+          "body": "只在安全区内固定的 22dp 圆角底部导出操作使用裁切后的 14dp 背景模糊，保留清晰不透明的按钮内容。"
         }
       ],
       "dos": [
         "让波形、起止时间和试听成为编辑页的视觉中心。",
         "支持动态字号、可读对比度和足够大的触控区域。",
-        "跟随系统浅色与深色外观。"
+        "跟随系统浅色与深色外观。",
+        "只在底部导出栏使用轻量磨砂玻璃，波形和编辑内容保持清晰。"
       ],
       "donts": [
-        "复刻旧版近黑背景、薄荷绿大按钮、多层大圆角卡片和口号式大标题。",
+        "复刻旧版近黑背景、高饱和薄荷绿大按钮、多层大圆角卡片和口号式大标题。",
         "堆叠大卡片或加入与剪辑无关的装饰。",
+        "在波形或整页上重复施加模糊效果。",
         "增加登录、自动同步、上传或远程分析入口。"
       ]
     }

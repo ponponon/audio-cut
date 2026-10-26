@@ -2,22 +2,26 @@
 name: 本地音剪
 description: 一款参考 iOS 语音备忘录、在设备本机完成音频剪辑的工具
 colors:
-  primary: "#C64025"
-  primary-dark: "#FF896B"
-  canvas-light: "#F2F2F7"
-  canvas-dark: "#000000"
+  primary: "#167A4B"
+  primary-dark: "#63CC90"
+  canvas-light: "#F4F7F4"
+  canvas-dark: "#0D1510"
   surface-light: "#FFFFFF"
-  surface-dark: "#1C1C1E"
-  surface-secondary-light: "#E5E5EA"
-  surface-secondary-dark: "#2C2C2E"
-  ink-light: "#1C1C1E"
-  ink-dark: "#F5F5F7"
-  secondary-ink-light: "#636366"
-  secondary-ink-dark: "#AEAEB2"
-  separator-light: "#D1D1D6"
-  separator-dark: "#38383A"
-  waveform-track-light: "#F7F7F9"
-  waveform-track-dark: "#121214"
+  surface-dark: "#19221B"
+  surface-secondary-light: "#E6EFE7"
+  surface-secondary-dark: "#253128"
+  ink-light: "#1C271F"
+  ink-dark: "#EEF5EF"
+  secondary-ink-light: "#58675C"
+  secondary-ink-dark: "#A8B7AB"
+  separator-light: "#D0DBD2"
+  separator-dark: "#3A493E"
+  waveform-track-light: "#F2F7F3"
+  waveform-track-dark: "#111A14"
+  glass-surface-light: "#FFFFFF / 91% opacity"
+  glass-surface-dark: "#151E18 / 85% opacity"
+  glass-blur: "14dp"
+  glass-radius: "22dp"
 typography:
   display:
     fontFamily: "Platform system (SF Pro on iOS, Roboto on Android)"
@@ -68,7 +72,7 @@ components:
 
 界面参考 iOS「语音备忘录」：系统原生字体、清晰的信息层级，以及让波形和剪辑范围成为主角。所有视觉细节都服务于“选择、设定、试听、导出”这一条本机工作流。
 
-浅色和深色外观跟随系统。页面以平整的系统背景承托少量白色或深灰内容面板，暖珊瑚色只标记主要操作和当前选区。隐私说明保持简短、可见，不用大幅口号强调。
+浅色和深色外观跟随系统。页面以平整的系统背景承托少量白色或深绿灰内容面板，柔和的森林绿标记主要操作和当前选区。底部导出栏采用单层半透明模糊，提供轻量液态玻璃观感；隐私说明保持简短、可见。
 
 **Key Characteristics:**
 - 熟悉、克制的 iOS 工具感。
@@ -80,10 +84,10 @@ components:
 
 ## 2. Colors
 
-使用系统中性色作为画布与内容表面，珊瑚色作为唯一强调色。暗色外观切换到更亮的同色系强调色，保证黑色画布上的操作和选区仍清楚可辨。
+使用系统中性色作为画布与内容表面，微信风格的森林绿作为唯一强调色。浅色主题的按钮文字为白色；深色主题使用更亮的绿色和深色按钮文字，保持清晰对比。
 
 ### Primary
-- **语音备忘录珊瑚色** (`colors.primary` / `colors.primary-dark`)：用于主按钮、波形、范围边界和当前状态；不要拿它装饰非交互内容。
+- **森林绿** (`colors.primary` / `colors.primary-dark`)：用于主按钮、波形、范围边界和当前状态；不要拿它装饰非交互内容。浅色按钮 `#167A4B` 配白字的对比度为 5.36:1，暗色按钮 `#63CC90` 配深色字为 7.97:1。
 
 ### Neutral
 - **系统画布** (`colors.canvas-light` / `colors.canvas-dark`)：页面最底层背景，随系统外观切换。
@@ -93,7 +97,7 @@ components:
 - **次级文字** (`colors.secondary-ink-light` / `colors.secondary-ink-dark`)：格式、说明和隐私提示；文字对比保持易读。
 - **分隔线** (`colors.separator-light` / `colors.separator-dark`)：仅用于分组边界和底部操作栏。
 
-**The One Accent Rule.** 珊瑚色仅表示主要操作、选区或播放进度；静止内容使用中性色。
+**The One Accent Rule.** 森林绿仅表示主要操作、选区或播放进度；静止内容使用中性色。
 
 ## 3. Typography
 
@@ -113,15 +117,17 @@ components:
 
 ## 4. Elevation
 
-默认不使用投影。层次由系统背景、内容表面和细分隔线建立；弹层使用系统模态背景和原生圆角。不要给静态卡片添加悬浮阴影。
+默认不使用投影。层次由系统背景、内容表面和细分隔线建立；仅底部导出操作使用 14dp 背景模糊、半透明色面和 22dp 圆角悬浮胶囊模拟磨砂玻璃。不要给静态卡片添加悬浮阴影或扩大模糊区域。
 
 **The Flat Surface Rule.** 只在需要区分内容区域时切换表面色，不堆叠容器或用阴影模拟深度。
+
+**The Single Glass Rule.** 玻璃效果只用于固定在底部安全区内的圆角导出操作；保持按钮文字不透明、边缘清楚，并在没有背景内容时由半透明底色自然回退。
 
 ## 5. Components
 
 ### Buttons
 - **Shape:** 轻微圆角，主按钮为 `rounded.button`。
-- **Primary:** 珊瑚色底、白字，最小高度 52dp；动态字号可以继续增高。
+- **Primary:** 浅色主题使用森林绿底白字，深色主题使用浅绿底深色字；最小高度 52dp，动态字号可以继续增高。
 - **Secondary:** 文字与图标使用强调色，不加厚重底板。
 - **Focus / Disabled:** 使用 Flutter 与系统可见的焦点、禁用状态，不隐藏可操作性。
 
@@ -130,6 +136,7 @@ components:
 - **Background:** 采用当前系统外观对应的内容表面色。
 - **Shadow Strategy:** 无静态阴影。
 - **Internal Padding:** 16dp；不要在卡片内再包一层卡片。
+- **Glass Footer:** 在滚动内容上方使用一处裁切后的 `BackdropFilter`，模糊半径为 14dp、圆角 22dp；底色浅色 91% 不透明、深色 85% 不透明。不要将波形或整页内容模糊。
 
 ### Inputs / Fields
 - 时间字段是可点按的整块触控目标，显示“开始/结束”和时间值。
@@ -151,9 +158,11 @@ components:
 - **Do** 使用动态字号、可读对比度和至少 44dp 的可操作触控目标。
 - **Do** 让浅色与深色外观使用同一套中性层级和语义强调色。
 - **Do** 将本机处理说明放在容易找到的位置，但保持简短。
+- **Do** 只在底部导出栏使用轻量磨砂玻璃，保证其余编辑内容清晰稳定。
 
 ### Don't:
-- **Don't** 复刻 PRODUCT.md 所述“near-black canvas paired with mint-green oversized actions, stacked oversized rounded cards, and a slogan-like hero heading”。
+- **Don't** 复刻 PRODUCT.md 所述“near-black canvas paired with saturated mint-green oversized actions, stacked oversized rounded cards, and a slogan-like hero heading”。
 - **Don't** 堆叠大卡片、装饰性大标题、渐变或与音频编辑无关的图形。
 - **Don't** 把正文、时间或触控区域缩小来挤进固定高度。
 - **Don't** 增加登录、自动同步、上传或远程分析入口。
+- **Don't** 在整页、波形或多个重复容器上套用高开销模糊。

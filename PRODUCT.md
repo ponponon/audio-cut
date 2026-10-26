@@ -18,7 +18,7 @@ Quiet, precise, trustworthy. The interface should feel as familiar and direct as
 
 ## Anti-references
 
-- The previous interface's near-black canvas paired with mint-green oversized actions, stacked oversized rounded cards, and a slogan-like hero heading.
+- The previous interface's near-black canvas paired with saturated mint-green oversized actions, stacked oversized rounded cards, and a slogan-like hero heading.
 - Audio editors that require an account, automatically synchronize recordings, or send audio to a remote service.
 - Decorative visual effects that make the waveform and trim boundaries harder to see.
 
@@ -27,7 +27,8 @@ Quiet, precise, trustworthy. The interface should feel as familiar and direct as
 - Keep audio and edit operations on the device, and explain that plainly.
 - Make the waveform and selected time range the visual center of the editor.
 - Use familiar platform controls and clear feedback for import, playback, time entry, and export.
-- Keep the surface calm and light, with one restrained accent for active controls and selection.
+- Keep the surface calm and light, with a restrained, WeChat-inspired forest-green accent for active controls and selection.
+- Use one subtle floating glass surface for the export action; keep the waveform and editing controls crisp.
 - Follow system dynamic type, maintain readable contrast, and provide generous touch targets.
 
 ## Accessibility & Inclusion

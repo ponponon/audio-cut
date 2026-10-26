@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 import 'dart:math' as math;
+import 'dart:ui' show ImageFilter;
 
 import 'package:flutter/cupertino.dart';
 import 'package:file_picker/file_picker.dart';
@@ -26,6 +27,8 @@ class _EditorPalette {
     required this.secondaryInk,
     required this.separator,
     required this.accent,
+    required this.onAccent,
+    required this.glassSurface,
     required this.waveformTrack,
   });
 
@@ -36,28 +39,34 @@ class _EditorPalette {
   final Color secondaryInk;
   final Color separator;
   final Color accent;
+  final Color onAccent;
+  final Color glassSurface;
   final Color waveformTrack;
 
   static const light = _EditorPalette(
-    canvas: Color(0xFFF2F2F7),
+    canvas: Color(0xFFF4F7F4),
     surface: Color(0xFFFFFFFF),
-    secondarySurface: Color(0xFFE5E5EA),
-    ink: Color(0xFF1C1C1E),
-    secondaryInk: Color(0xFF636366),
-    separator: Color(0xFFD1D1D6),
-    accent: Color(0xFFC64025),
-    waveformTrack: Color(0xFFF7F7F9),
+    secondarySurface: Color(0xFFE6EFE7),
+    ink: Color(0xFF1C271F),
+    secondaryInk: Color(0xFF58675C),
+    separator: Color(0xFFD0DBD2),
+    accent: Color(0xFF167A4B),
+    onAccent: Color(0xFFFFFFFF),
+    glassSurface: Color(0xE8FFFFFF),
+    waveformTrack: Color(0xFFF2F7F3),
   );
 
   static const dark = _EditorPalette(
-    canvas: Color(0xFF000000),
-    surface: Color(0xFF1C1C1E),
-    secondarySurface: Color(0xFF2C2C2E),
-    ink: Color(0xFFF5F5F7),
-    secondaryInk: Color(0xFFAEAEB2),
-    separator: Color(0xFF38383A),
-    accent: Color(0xFFFF896B),
-    waveformTrack: Color(0xFF121214),
+    canvas: Color(0xFF0D1510),
+    surface: Color(0xFF19221B),
+    secondarySurface: Color(0xFF253128),
+    ink: Color(0xFFEEF5EF),
+    secondaryInk: Color(0xFFA8B7AB),
+    separator: Color(0xFF3A493E),
+    accent: Color(0xFF63CC90),
+    onAccent: Color(0xFF102719),
+    glassSurface: Color(0xD9151E18),
+    waveformTrack: Color(0xFF111A14),
   );
 
   static _EditorPalette of(BuildContext context) =>
@@ -72,9 +81,9 @@ ThemeData _buildTheme(_EditorPalette palette, Brightness brightness) {
         surface: palette.surface,
       ).copyWith(
         primary: palette.accent,
-        onPrimary: Colors.white,
+        onPrimary: palette.onAccent,
         secondary: palette.accent,
-        onSecondary: Colors.white,
+        onSecondary: palette.onAccent,
         surface: palette.surface,
         onSurface: palette.ink,
         outline: palette.separator,
@@ -102,7 +111,7 @@ ThemeData _buildTheme(_EditorPalette palette, Brightness brightness) {
     filledButtonTheme: FilledButtonThemeData(
       style: FilledButton.styleFrom(
         backgroundColor: palette.accent,
-        foregroundColor: Colors.white,
+        foregroundColor: palette.onAccent,
         minimumSize: const Size.fromHeight(52),
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
         textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
@@ -677,6 +686,7 @@ class _EditorScreenState extends State<_EditorScreen> {
     final palette = _EditorPalette.of(context);
     final hasAudio = _sourcePath != null;
     return Scaffold(
+      extendBody: hasAudio,
       appBar: AppBar(
         title: const Text('本地音剪'),
         actions: [
@@ -780,7 +790,12 @@ class _EditorScreenState extends State<_EditorScreen> {
 
   Widget _editorBody(_EditorPalette palette) {
     return ListView(
-      padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
+      padding: EdgeInsets.fromLTRB(
+        20,
+        12,
+        20,
+        MediaQuery.viewPaddingOf(context).bottom + 96,
+      ),
       children: [
         _fileHeader(palette),
         const SizedBox(height: 22),
@@ -1110,7 +1125,7 @@ class _EditorScreenState extends State<_EditorScreen> {
               ),
               style: IconButton.styleFrom(
                 backgroundColor: palette.accent,
-                foregroundColor: Colors.white,
+                foregroundColor: palette.onAccent,
                 minimumSize: const Size(52, 52),
               ),
             );
@@ -1176,21 +1191,36 @@ class _EditorScreenState extends State<_EditorScreen> {
   }
 
   Widget _bottomAction(_EditorPalette palette) {
-    return Container(
-      decoration: BoxDecoration(
-        color: palette.canvas,
-        border: Border(top: BorderSide(color: palette.separator)),
-      ),
-      child: SafeArea(
-        top: false,
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(20, 12, 20, 10),
-          child: SizedBox(
-            width: double.infinity,
-            child: FilledButton.icon(
-              onPressed: _exporting || _loading ? null : _showExportFormats,
-              icon: const Icon(Icons.ios_share_rounded),
-              label: Text(_exporting ? '正在导出…' : '导出片段'),
+    return SafeArea(
+      top: false,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(22),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 14, sigmaY: 14),
+            child: Container(
+              decoration: BoxDecoration(
+                color: palette.glassSurface,
+                borderRadius: BorderRadius.circular(22),
+                border: Border.all(
+                  color: palette.separator.withValues(alpha: .72),
+                  width: .8,
+                ),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(10),
+                child: SizedBox(
+                  width: double.infinity,
+                  child: FilledButton.icon(
+                    onPressed: _exporting || _loading
+                        ? null
+                        : _showExportFormats,
+                    icon: const Icon(Icons.ios_share_rounded),
+                    label: Text(_exporting ? '正在导出…' : '导出片段'),
+                  ),
+                ),
+              ),
             ),
           ),
         ),
