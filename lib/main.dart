@@ -14,6 +14,8 @@ import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 
+import 'l10n/app_localizations.dart';
+
 void main() {
   runApp(const LocalAudioCutApp());
 }
@@ -145,31 +147,12 @@ ThemeData _buildTheme(_EditorPalette palette, Brightness brightness) {
 }
 
 const _formats = <_ExportFormat>[
-  _ExportFormat('MP3', 'mp3', '通用、体积小', ['-c:a', 'libmp3lame', '-q:a', '2']),
-  _ExportFormat('M4A', 'm4a', 'AAC 编码，适合手机播放', [
-    '-c:a',
-    'aac',
-    '-b:a',
-    '192k',
-    '-f',
-    'ipod',
-  ]),
-  _ExportFormat('WAV', 'wav', '未压缩，适合后续编辑', ['-c:a', 'pcm_s16le', '-f', 'wav']),
-  _ExportFormat('FLAC', 'flac', '无损压缩', [
-    '-c:a',
-    'flac',
-    '-compression_level',
-    '5',
-  ]),
-  _ExportFormat('OGG', 'ogg', 'Vorbis 编码', [
-    '-c:a',
-    'libvorbis',
-    '-q:a',
-    '5',
-    '-f',
-    'ogg',
-  ]),
-  _ExportFormat('Opus', 'opus', '高压缩率，适合语音', [
+  _ExportFormat('MP3', 'mp3', ['-c:a', 'libmp3lame', '-q:a', '2']),
+  _ExportFormat('M4A', 'm4a', ['-c:a', 'aac', '-b:a', '192k', '-f', 'ipod']),
+  _ExportFormat('WAV', 'wav', ['-c:a', 'pcm_s16le', '-f', 'wav']),
+  _ExportFormat('FLAC', 'flac', ['-c:a', 'flac', '-compression_level', '5']),
+  _ExportFormat('OGG', 'ogg', ['-c:a', 'libvorbis', '-q:a', '5', '-f', 'ogg']),
+  _ExportFormat('Opus', 'opus', [
     '-c:a',
     'libopus',
     '-b:a',
@@ -179,36 +162,19 @@ const _formats = <_ExportFormat>[
   ]),
 ];
 
-const _inAppPrivacyPolicy = '''本地音剪隐私说明
-
-本地音剪由本地音剪项目维护者开发。隐私联系渠道：GitHub 项目问题反馈页（github.com/ponponon/audio-cut/issues）。请勿在公开问题中附上私人音频或敏感信息。
-
-音频文件
-你通过系统文件选择器主动选中的音频，仅用于在本机分析、试听、剪切和转码。应用会将工作副本和导出文件放在应用的临时目录；应用下次启动时会清理该工作目录。原始文件不会被应用修改。
-
-网络与收集
-应用不设账号、广告、云同步、远程分析或崩溃上报服务，不会由本应用把音频、文件名或其他个人数据发送给开发者或服务器。应用不申请全盘存储或麦克风权限；仅通过系统文件选择器读取你选中的文件。
-
-导出与第三方应用
-导出时，应用会打开系统分享面板。只有在你主动选择接收应用或保存位置后，导出文件才会交给该目标。接收应用可能按照自己的服务规则保存或传输文件；这部分不由本地音剪控制。
-
-删除与保留
-工作文件会在应用下次启动时清理。你也可以通过系统设置清除本应用数据或卸载应用，删除本应用保留在设备内的文件。你主动交给其他应用的副本，需要在对应应用中单独管理。
-
-联系与更新
-如对隐私处理有疑问，可通过 GitHub 项目问题反馈页联系维护者。应用功能或处理方式变更时，本说明会同步更新。''';
-
 class LocalAudioCutApp extends StatelessWidget {
   const LocalAudioCutApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: '本地音频剪辑',
+      onGenerateTitle: (context) => AppLocalizations.of(context).appTitle,
       debugShowCheckedModeBanner: false,
       themeMode: ThemeMode.system,
       theme: _buildTheme(_EditorPalette.light, Brightness.light),
       darkTheme: _buildTheme(_EditorPalette.dark, Brightness.dark),
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
       home: const _EditorScreen(),
     );
   }
@@ -223,6 +189,8 @@ class _EditorScreen extends StatefulWidget {
 
 class _EditorScreenState extends State<_EditorScreen> {
   final AudioPlayer _player = AudioPlayer();
+
+  AppLocalizations get _l10n => AppLocalizations.of(context);
 
   late final Future<Directory> _workDirectoryFuture;
   Directory? _workDirectory;
@@ -281,7 +249,7 @@ class _EditorScreenState extends State<_EditorScreen> {
     if (_loading || _exporting) return;
     setState(() {
       _loading = true;
-      _activity = '请选择音频文件…';
+      _activity = _l10n.activitySelectAudio;
     });
     try {
       final picked = await FilePicker.pickFile(
@@ -298,7 +266,7 @@ class _EditorScreenState extends State<_EditorScreen> {
         return;
       }
       if (!mounted) return;
-      setState(() => _activity = '正在读取音频…');
+      setState(() => _activity = _l10n.activityReadingAudio);
       final directory = _workDirectory ?? await _workDirectoryFuture;
       final extension = p
           .extension(picked.name)
@@ -317,12 +285,12 @@ class _EditorScreenState extends State<_EditorScreen> {
         await sourceSink.close();
       }
 
-      setState(() => _activity = '正在分析波形…');
+      setState(() => _activity = _l10n.activityAnalyzingWaveform);
       final probeSession = await FFprobeKit.getMediaInformation(source.path);
       final media = probeSession.getMediaInformation();
       final seconds = double.tryParse(media?.getDuration() ?? '');
       if (seconds == null || !seconds.isFinite || seconds <= 0) {
-        throw const FormatException('无法读取音频时长。请确认文件没有损坏，且编码格式受支持。');
+        throw FormatException(_l10n.errorUnableReadDuration);
       }
       final duration = Duration(
         microseconds: (seconds * Duration.microsecondsPerSecond).round(),
@@ -349,7 +317,7 @@ class _EditorScreenState extends State<_EditorScreen> {
       ]);
       final waveformCode = await waveformSession.getReturnCode();
       if (!ReturnCode.isSuccess(waveformCode) || !await waveform.exists()) {
-        throw const FormatException('读取成功，但生成波形失败。这个文件可能包含暂不支持的音频编码。');
+        throw FormatException(_l10n.errorWaveformFailed);
       }
 
       await _player.stop();
@@ -390,7 +358,9 @@ class _EditorScreenState extends State<_EditorScreen> {
         _sourcePath = source.path;
         _waveformPath = waveform.path;
         _sourceName = picked.name;
-        _sourceFormat = extension.isEmpty ? '音频' : extension.toUpperCase();
+        _sourceFormat = extension.isEmpty
+            ? _l10n.defaultAudioName
+            : extension.toUpperCase();
         _duration = duration;
         _cutStart = Duration.zero;
         _cutEnd = duration;
@@ -403,7 +373,7 @@ class _EditorScreenState extends State<_EditorScreen> {
         _loading = false;
         _activity = '';
       });
-      _showMessage(_friendlyError(error));
+      _showMessage(_l10n.audioLoadFailed(_friendlyError(error)));
     }
   }
 
@@ -418,7 +388,7 @@ class _EditorScreenState extends State<_EditorScreen> {
         void submit() {
           final parsed = _parseDuration(controller.text);
           if (parsed == null) {
-            _showMessage('请输入有效时间，例如 00:12.50。');
+            _showMessage(_l10n.invalidTimeExample);
             return;
           }
           Navigator.pop(dialogContext, parsed);
@@ -430,7 +400,9 @@ class _EditorScreenState extends State<_EditorScreen> {
             primaryColor: palette.accent,
           ),
           child: CupertinoAlertDialog(
-            title: Text(editStart ? '设置开始位置' : '设置结束位置'),
+            title: Text(
+              editStart ? _l10n.editStartPosition : _l10n.editEndPosition,
+            ),
             content: Padding(
               padding: const EdgeInsets.only(top: 14),
               child: Column(
@@ -442,7 +414,7 @@ class _EditorScreenState extends State<_EditorScreen> {
                       decimal: true,
                     ),
                     style: TextStyle(color: palette.ink, fontSize: 17),
-                    placeholder: '例如 00:12.50 或 12.5',
+                    placeholder: _l10n.timePlaceholder,
                     placeholderStyle: TextStyle(
                       color: palette.secondaryInk,
                       fontSize: 15,
@@ -459,7 +431,7 @@ class _EditorScreenState extends State<_EditorScreen> {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    '可输入 时:分:秒 或秒数',
+                    _l10n.timeInputHint,
                     style: TextStyle(color: palette.secondaryInk, fontSize: 13),
                   ),
                 ],
@@ -468,12 +440,12 @@ class _EditorScreenState extends State<_EditorScreen> {
             actions: [
               CupertinoDialogAction(
                 onPressed: () => Navigator.pop(dialogContext),
-                child: const Text('取消'),
+                child: Text(_l10n.cancel),
               ),
               CupertinoDialogAction(
                 isDefaultAction: true,
                 onPressed: submit,
-                child: const Text('确定'),
+                child: Text(_l10n.confirm),
               ),
             ],
           ),
@@ -546,7 +518,7 @@ class _EditorScreenState extends State<_EditorScreen> {
         unawaited(_player.play());
       }
     } catch (error) {
-      _showMessage('试听失败：${_friendlyError(error)}');
+      _showMessage(_l10n.previewFailed(_friendlyError(error)));
     }
   }
 
@@ -559,6 +531,7 @@ class _EditorScreenState extends State<_EditorScreen> {
       showDragHandle: true,
       isScrollControlled: true,
       builder: (context) {
+        final l10n = AppLocalizations.of(context);
         final maxSheetHeight = MediaQuery.of(context).size.height * 0.9;
         return SafeArea(
           child: ConstrainedBox(
@@ -570,7 +543,7 @@ class _EditorScreenState extends State<_EditorScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    '选择导出格式',
+                    l10n.selectExportFormat,
                     style: TextStyle(
                       color: palette.ink,
                       fontSize: 20,
@@ -579,7 +552,7 @@ class _EditorScreenState extends State<_EditorScreen> {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    '文件会在本机处理，保存位置由你选择。',
+                    l10n.exportLocalStorageDescription,
                     style: TextStyle(color: palette.secondaryInk, fontSize: 14),
                   ),
                   const SizedBox(height: 10),
@@ -596,7 +569,7 @@ class _EditorScreenState extends State<_EditorScreen> {
                         ),
                       ),
                       subtitle: Text(
-                        _formats[index].description,
+                        _formatDescription(l10n, _formats[index]),
                         style: TextStyle(color: palette.secondaryInk),
                       ),
                       trailing: Icon(
@@ -625,12 +598,25 @@ class _EditorScreenState extends State<_EditorScreen> {
         .replaceAll(RegExp(r'[\\/:*?"<>|]'), '_')
         .trim()
         .replaceAll(RegExp(r'[. ]+$'), '');
-    if (baseName.isEmpty) baseName = 'audio';
-    if (!baseName.toLowerCase().endsWith('_cut')) {
-      baseName = '${baseName}_cut';
+    if (baseName.isEmpty) baseName = _l10n.defaultAudioName;
+    final suffix = _l10n.cutSuffix;
+    if (!baseName.toLowerCase().endsWith(suffix.toLowerCase()) &&
+        !baseName.toLowerCase().endsWith('_cut')) {
+      baseName = '$baseName$suffix';
     }
     return baseName;
   }
+
+  String _formatDescription(AppLocalizations l10n, _ExportFormat format) =>
+      switch (format.extension) {
+        'mp3' => l10n.formatMp3Description,
+        'm4a' => l10n.formatM4aDescription,
+        'wav' => l10n.formatWavDescription,
+        'flac' => l10n.formatFlacDescription,
+        'ogg' => l10n.formatOggDescription,
+        'opus' => l10n.formatOpusDescription,
+        _ => '',
+      };
 
   String? _normalizeExportBaseName(String raw) {
     var baseName = raw.trim();
@@ -662,7 +648,7 @@ class _EditorScreenState extends State<_EditorScreen> {
               final baseName = _normalizeExportBaseName(controller.text);
               if (baseName == null) {
                 setDialogState(() {
-                  validationMessage = '请输入文件名，且不要包含路径或特殊字符。';
+                  validationMessage = _l10n.invalidFileName;
                 });
                 return;
               }
@@ -670,7 +656,7 @@ class _EditorScreenState extends State<_EditorScreen> {
             }
 
             return CupertinoAlertDialog(
-              title: const Text('自定义导出文件名'),
+              title: Text(_l10n.exportFilenameTitle),
               content: Padding(
                 padding: const EdgeInsets.only(top: 14),
                 child: Column(
@@ -682,7 +668,7 @@ class _EditorScreenState extends State<_EditorScreen> {
                       autofocus: true,
                       textInputAction: TextInputAction.done,
                       style: TextStyle(color: palette.ink, fontSize: 17),
-                      placeholder: '输入文件名',
+                      placeholder: _l10n.filenamePlaceholder,
                       placeholderStyle: TextStyle(
                         color: palette.secondaryInk,
                         fontSize: 15,
@@ -714,7 +700,7 @@ class _EditorScreenState extends State<_EditorScreen> {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      '将导出为 ${format.label}，扩展名会自动添加。',
+                      _l10n.exportAsFormat(format.label),
                       style: TextStyle(
                         color: palette.secondaryInk,
                         fontSize: 13,
@@ -736,12 +722,12 @@ class _EditorScreenState extends State<_EditorScreen> {
               actions: [
                 CupertinoDialogAction(
                   onPressed: () => Navigator.pop(dialogContext),
-                  child: const Text('取消'),
+                  child: Text(_l10n.cancel),
                 ),
                 CupertinoDialogAction(
                   isDefaultAction: true,
                   onPressed: submit,
-                  child: const Text('导出'),
+                  child: Text(_l10n.export),
                 ),
               ],
             );
@@ -761,7 +747,7 @@ class _EditorScreenState extends State<_EditorScreen> {
 
     setState(() {
       _exporting = true;
-      _activity = '正在导出 ${format.label}…';
+      _activity = _l10n.activityExportingFormat(format.label);
     });
     try {
       final directory = _workDirectory ?? await _workDirectoryFuture;
@@ -795,20 +781,22 @@ class _EditorScreenState extends State<_EditorScreen> {
       if (!ReturnCode.isSuccess(await session.getReturnCode())) {
         final output = await session.getOutput();
         throw FileSystemException(
-          output?.trim().isNotEmpty == true ? output!.trim() : '音频导出失败。',
+          output?.trim().isNotEmpty == true
+              ? output!.trim()
+              : _l10n.audioExportFailed,
         );
       }
       await SharePlus.instance.share(
         ShareParams(
-          title: '保存剪辑音频',
+          title: _l10n.shareTitle,
           subject: exportName,
           files: [XFile(outputPath, mimeType: _mimeType(format.extension))],
         ),
       );
       if (!mounted) return;
-      _showMessage('音频已生成。可在系统分享面板中保存到设备。');
+      _showMessage(_l10n.exportSuccess);
     } catch (error) {
-      if (mounted) _showMessage('导出失败：${_friendlyError(error)}');
+      if (mounted) _showMessage(_l10n.exportFailed(_friendlyError(error)));
     } finally {
       if (mounted) {
         setState(() {
@@ -840,13 +828,13 @@ class _EditorScreenState extends State<_EditorScreen> {
             primaryColor: palette.accent,
           ),
           child: CupertinoAlertDialog(
-            title: const Text('隐私政策'),
+            title: Text(_l10n.privacyPolicy),
             content: SizedBox(
               height: maxContentHeight,
               child: SingleChildScrollView(
                 padding: const EdgeInsets.only(top: 14),
                 child: Text(
-                  _inAppPrivacyPolicy,
+                  _l10n.privacyPolicyBody,
                   textAlign: TextAlign.left,
                   style: TextStyle(
                     color: palette.secondaryInk,
@@ -860,14 +848,17 @@ class _EditorScreenState extends State<_EditorScreen> {
               CupertinoDialogAction(
                 onPressed: () {
                   Navigator.pop(dialogContext);
-                  showLicensePage(context: context, applicationName: '本地音剪');
+                  showLicensePage(
+                    context: context,
+                    applicationName: _l10n.appName,
+                  );
                 },
-                child: const Text('开源许可'),
+                child: Text(_l10n.openSourceLicenses),
               ),
               CupertinoDialogAction(
                 isDefaultAction: true,
                 onPressed: () => Navigator.pop(dialogContext),
-                child: const Text('关闭'),
+                child: Text(_l10n.close),
               ),
             ],
           ),
@@ -901,7 +892,7 @@ class _EditorScreenState extends State<_EditorScreen> {
     return Scaffold(
       extendBody: hasAudio,
       appBar: AppBar(
-        title: const Text('本地音剪'),
+        title: Text(_l10n.appName),
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: 8),
@@ -913,7 +904,7 @@ class _EditorScreenState extends State<_EditorScreen> {
                 color: palette.secondaryInk,
               ),
               label: Text(
-                '仅本机',
+                _l10n.localOnly,
                 style: TextStyle(
                   color: palette.secondaryInk,
                   fontSize: 13,
@@ -959,7 +950,7 @@ class _EditorScreenState extends State<_EditorScreen> {
         ),
         const SizedBox(height: 24),
         Text(
-          '剪辑一段音频',
+          _l10n.emptyTitle,
           textAlign: TextAlign.center,
           style: TextStyle(
             color: palette.ink,
@@ -970,7 +961,7 @@ class _EditorScreenState extends State<_EditorScreen> {
         ),
         const SizedBox(height: 10),
         Text(
-          '选择设备中的音频，设定起止位置后试听并导出。',
+          _l10n.emptyDescription,
           textAlign: TextAlign.center,
           style: TextStyle(
             color: palette.secondaryInk,
@@ -984,12 +975,12 @@ class _EditorScreenState extends State<_EditorScreen> {
           child: FilledButton.icon(
             onPressed: _loading ? null : _pickAudio,
             icon: const Icon(Icons.folder_open_rounded),
-            label: const Text('选择音频'),
+            label: Text(_l10n.chooseAudio),
           ),
         ),
         const SizedBox(height: 14),
         Text(
-          'MP3 · M4A · WAV · FLAC · OGG · Opus',
+          _l10n.supportedFormats('MP3 · M4A · WAV · FLAC · OGG · Opus'),
           textAlign: TextAlign.center,
           style: TextStyle(color: palette.secondaryInk, fontSize: 14),
         ),
@@ -1060,7 +1051,7 @@ class _EditorScreenState extends State<_EditorScreen> {
         TextButton.icon(
           onPressed: _loading || _exporting ? null : _pickAudio,
           icon: const Icon(Icons.swap_horiz_rounded, size: 18),
-          label: const Text('更换'),
+          label: Text(_l10n.switchAudio),
           style: TextButton.styleFrom(
             foregroundColor: palette.accent,
             minimumSize: const Size(48, 48),
@@ -1085,7 +1076,7 @@ class _EditorScreenState extends State<_EditorScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                '剪辑范围',
+                _l10n.clipRange,
                 style: TextStyle(
                   color: palette.ink,
                   fontSize: 17,
@@ -1097,7 +1088,7 @@ class _EditorScreenState extends State<_EditorScreen> {
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   Text(
-                    '片段 ${_durationText(clipLength)}',
+                    _l10n.clipDuration(_durationText(clipLength)),
                     style: TextStyle(
                       color: palette.accent,
                       fontSize: 14,
@@ -1106,7 +1097,7 @@ class _EditorScreenState extends State<_EditorScreen> {
                   ),
                   const SizedBox(height: 3),
                   Text(
-                    '总长 ${_durationText(_duration)}',
+                    _l10n.totalDuration(_durationText(_duration)),
                     style: TextStyle(color: palette.secondaryInk, fontSize: 12),
                   ),
                 ],
@@ -1198,7 +1189,7 @@ class _EditorScreenState extends State<_EditorScreen> {
           const SizedBox(height: 5),
           Center(
             child: Text(
-              '拖动两端手柄，或点下方时间输入',
+              _l10n.dragHandlesHint,
               textAlign: TextAlign.center,
               style: TextStyle(color: palette.secondaryInk, fontSize: 12),
             ),
@@ -1248,15 +1239,20 @@ class _EditorScreenState extends State<_EditorScreen> {
           child: stacked
               ? Column(
                   children: [
-                    _timeButton('开始', _cutStart, palette, true),
+                    _timeButton(_l10n.startTime, _cutStart, palette, true),
                     Divider(height: 1, color: palette.separator),
-                    _timeButton('结束', _cutEnd, palette, false),
+                    _timeButton(_l10n.endTime, _cutEnd, palette, false),
                   ],
                 )
               : Row(
                   children: [
                     Expanded(
-                      child: _timeButton('开始', _cutStart, palette, true),
+                      child: _timeButton(
+                        _l10n.startTime,
+                        _cutStart,
+                        palette,
+                        true,
+                      ),
                     ),
                     SizedBox(
                       height: 48,
@@ -1266,7 +1262,14 @@ class _EditorScreenState extends State<_EditorScreen> {
                         color: palette.separator,
                       ),
                     ),
-                    Expanded(child: _timeButton('结束', _cutEnd, palette, false)),
+                    Expanded(
+                      child: _timeButton(
+                        _l10n.endTime,
+                        _cutEnd,
+                        palette,
+                        false,
+                      ),
+                    ),
                   ],
                 ),
         );
@@ -1333,7 +1336,7 @@ class _EditorScreenState extends State<_EditorScreen> {
           builder: (context, snapshot) {
             final playing = snapshot.data?.playing ?? false;
             return IconButton.filled(
-              tooltip: playing ? '暂停试听' : '试听片段',
+              tooltip: playing ? _l10n.pausePreview : _l10n.previewClip,
               onPressed: _loading || _exporting ? null : _togglePreview,
               icon: Icon(
                 playing ? Icons.pause_rounded : Icons.play_arrow_rounded,
@@ -1369,7 +1372,7 @@ class _EditorScreenState extends State<_EditorScreen> {
                     children: [
                       Expanded(
                         child: Text(
-                          '试听片段',
+                          _l10n.previewClip,
                           style: TextStyle(
                             color: palette.ink,
                             fontSize: 14,
@@ -1432,7 +1435,9 @@ class _EditorScreenState extends State<_EditorScreen> {
                         ? null
                         : _showExportFormats,
                     icon: const Icon(Icons.ios_share_rounded),
-                    label: Text(_exporting ? '正在导出…' : '导出片段'),
+                    label: Text(
+                      _exporting ? _l10n.exporting : _l10n.exportClip,
+                    ),
                   ),
                 ),
               ),
@@ -1481,7 +1486,7 @@ class _EditorScreenState extends State<_EditorScreen> {
         const SizedBox(width: 7),
         Flexible(
           child: Text(
-            '仅在本机处理 · 不上传、不自动同步',
+            _l10n.localOnlyNote,
             textAlign: TextAlign.center,
             style: TextStyle(
               color: palette.secondaryInk,
@@ -1551,16 +1556,10 @@ class _SelectionPainter extends CustomPainter {
 }
 
 class _ExportFormat {
-  const _ExportFormat(
-    this.label,
-    this.extension,
-    this.description,
-    this.codecArguments,
-  );
+  const _ExportFormat(this.label, this.extension, this.codecArguments);
 
   final String label;
   final String extension;
-  final String description;
   final List<String> codecArguments;
 }
 
