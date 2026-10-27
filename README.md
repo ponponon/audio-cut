@@ -43,3 +43,9 @@ flutter run
 ## 许可证
 
 本项目源代码使用 [MIT License](LICENSE)。第三方依赖及随应用分发的编解码库仍受各自许可证约束；其中 `ffmpeg_kit_flutter_new_audio` 使用 LGPL-3.0，分发应用时请同时遵守其许可证要求。
+
+第三方组件、许可证副本和发布前复核要求见 [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md)。
+
+## Google Play 发布
+
+发布前材料和操作步骤见 [`docs/google-play/release-checklist.md`](docs/google-play/release-checklist.md)。首次发布需要在本机生成并安全备份 Android 上传密钥，然后构建已签名的 App Bundle。隐私政策网页位于 `docs/privacy-policy.html`；启用 GitHub Pages 后，将其公开 URL 填入 Play Console。

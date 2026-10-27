@@ -16,6 +16,7 @@
 - 以时间输入和波形选区设置开始、结束位置。
 - 试听原音频和裁切选区。
 - 本地导出 MP3、M4A、WAV、FLAC、OGG、Opus。
+- 导出前可编辑文件名；所选格式的扩展名自动添加，取消命名会中止本次导出。
 - UI 参考 iOS「语音备忘录」：跟随系统浅色/深色外观，支持系统动态字号，波形与剪辑范围优先呈现；使用柔和的森林绿强调色。
 - 编辑页底部导出栏使用轻量磨砂玻璃效果；以 Flutter 内置背景模糊近似液态玻璃，不引入额外渲染插件。
 - 导出先写入本机临时目录，再打开系统分享面板，让用户保存到 Files、系统文件提供方或其他目标。
@@ -27,6 +28,15 @@
 - Android 发布包不保留 `INTERNET`、`ACCESS_NETWORK_STATE`、全盘存储或麦克风权限。
 - 临时副本放在应用沙盒；导出文件由系统分享面板交给用户选择目的地；临时副本可在下次启动时清理。
 - 系统文件提供方可能是用户自己配置的云盘；本应用不发起上传或同步。
+
+## Google Play 发布准备
+
+- 顶栏“仅本机”可打开完整的应用内隐私说明；同时提供 Flutter 依赖开源许可列表。
+- 商店资料草稿、Data safety 草稿和逐项发布清单位于 `docs/google-play/`。
+- `docs/` 包含轻量项目主页和中英文隐私政策，供 GitHub Pages 发布；公开的隐私政策链接是 Play Console 必填项。
+- Google Play 图标和 feature graphic 由 `tooling/generate_google_play_assets.swift` 生成；Android/iOS 启动图标由 `tooling/update_launcher_icons.sh` 导出。
+- Android release 固定使用 target API 36；release 构建必须使用本机上传密钥，不使用 debug 签名。
+- 本机处理的音频不应被描述为上传数据；用户主动通过系统分享面板选择的目标由该目标的隐私规则负责。
 
 ## 后续候选
 

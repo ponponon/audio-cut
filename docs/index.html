@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#16452f">
+    <meta name="description" content="本地音剪：在设备本机选择、剪辑、试听和导出音频。">
+    <title>本地音剪 · 本机音频剪辑</title>
+    <style>
+      :root { color-scheme: light; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color: #1c3427; background: #f4f7f4; }
+      body { margin: 0; }
+      main { box-sizing: border-box; width: min(760px, 100%); min-height: 100vh; margin: 0 auto; padding: 12vh 28px 56px; display: flex; flex-direction: column; justify-content: center; }
+      .mark { width: 56px; height: 56px; border-radius: 17px; background: #16452f; color: #d4f0dc; display: grid; place-items: center; margin-bottom: 28px; }
+      .mark svg { width: 36px; height: 36px; }
+      h1 { margin: 0; font-size: clamp(2rem, 6vw, 3.3rem); letter-spacing: .01em; }
+      p { max-width: 600px; color: #52675a; font-size: 1.12rem; line-height: 1.75; }
+      nav { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 18px; }
+      a { color: #176542; font-weight: 600; text-underline-offset: 4px; }
+      .link { display: inline-flex; min-height: 46px; align-items: center; padding: 0 18px; border: 1px solid #bdcfc1; border-radius: 12px; background: #fff; }
+      footer { margin-top: 64px; color: #637468; font-size: .9rem; }
+      @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; } }
+    </style>
+  </head>
+  <body>
+    <main>
+      <div class="mark" aria-hidden="true">
+        <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M7 21v6m5-11v16m5-21v26m5-17v8m5-14v20m5-24v28m5-18v8m5-14v20" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+          <path d="M17 8v32m14-32v32" stroke="#B9E8CA" stroke-width="2.5" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <h1>本地音剪</h1>
+      <p>选择设备中的音频，调整剪辑范围，试听并导出。解码、剪切和转码都在设备本机完成。</p>
+      <nav aria-label="项目链接">
+        <a class="link" href="privacy-policy.html">隐私政策</a>
+        <a class="link" href="https://github.com/ponponon/audio-cut">GitHub 源码</a>
+        <a class="link" href="https://github.com/ponponon/audio-cut/issues">问题与隐私反馈</a>
+      </nav>
+      <footer>本地音剪项目 · Android / iOS</footer>
+    </main>
+  </body>
+</html>

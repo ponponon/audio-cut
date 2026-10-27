@@ -179,6 +179,25 @@ const _formats = <_ExportFormat>[
   ]),
 ];
 
+const _inAppPrivacyPolicy = '''本地音剪隐私说明
+
+本地音剪由本地音剪项目维护者开发。隐私联系渠道：GitHub 项目问题反馈页（github.com/ponponon/audio-cut/issues）。请勿在公开问题中附上私人音频或敏感信息。
+
+音频文件
+你通过系统文件选择器主动选中的音频，仅用于在本机分析、试听、剪切和转码。应用会将工作副本和导出文件放在应用的临时目录；应用下次启动时会清理该工作目录。原始文件不会被应用修改。
+
+网络与收集
+应用不设账号、广告、云同步、远程分析或崩溃上报服务，不会由本应用把音频、文件名或其他个人数据发送给开发者或服务器。应用不申请全盘存储或麦克风权限；仅通过系统文件选择器读取你选中的文件。
+
+导出与第三方应用
+导出时，应用会打开系统分享面板。只有在你主动选择接收应用或保存位置后，导出文件才会交给该目标。接收应用可能按照自己的服务规则保存或传输文件；这部分不由本地音剪控制。
+
+删除与保留
+工作文件会在应用下次启动时清理。你也可以通过系统设置清除本应用数据或卸载应用，删除本应用保留在设备内的文件。你主动交给其他应用的副本，需要在对应应用中单独管理。
+
+联系与更新
+如对隐私处理有疑问，可通过 GitHub 项目问题反馈页联系维护者。应用功能或处理方式变更时，本说明会同步更新。''';
+
 class LocalAudioCutApp extends StatelessWidget {
   const LocalAudioCutApp({super.key});
 
@@ -538,65 +557,206 @@ class _EditorScreenState extends State<_EditorScreen> {
       context: context,
       backgroundColor: palette.surface,
       showDragHandle: true,
-      builder: (context) => SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(20, 4, 20, 20),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                '选择导出格式',
-                style: TextStyle(
-                  color: palette.ink,
-                  fontSize: 20,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                '文件会在本机处理，保存位置由你选择。',
-                style: TextStyle(color: palette.secondaryInk, fontSize: 14),
-              ),
-              const SizedBox(height: 10),
-              for (var index = 0; index < _formats.length; index++) ...[
-                if (index > 0) Divider(height: 1, color: palette.separator),
-                ListTile(
-                  contentPadding: EdgeInsets.zero,
-                  minVerticalPadding: 14,
-                  title: Text(
-                    _formats[index].label,
+      isScrollControlled: true,
+      builder: (context) {
+        final maxSheetHeight = MediaQuery.of(context).size.height * 0.9;
+        return SafeArea(
+          child: ConstrainedBox(
+            constraints: BoxConstraints(maxHeight: maxSheetHeight),
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.fromLTRB(20, 4, 20, 20),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    '选择导出格式',
                     style: TextStyle(
                       color: palette.ink,
+                      fontSize: 20,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
-                  subtitle: Text(
-                    _formats[index].description,
-                    style: TextStyle(color: palette.secondaryInk),
+                  const SizedBox(height: 8),
+                  Text(
+                    '文件会在本机处理，保存位置由你选择。',
+                    style: TextStyle(color: palette.secondaryInk, fontSize: 14),
                   ),
-                  trailing: Icon(
-                    Icons.chevron_right_rounded,
-                    color: palette.secondaryInk,
-                  ),
-                  onTap: () => Navigator.pop(context, _formats[index]),
+                  const SizedBox(height: 10),
+                  for (var index = 0; index < _formats.length; index++) ...[
+                    if (index > 0) Divider(height: 1, color: palette.separator),
+                    ListTile(
+                      contentPadding: EdgeInsets.zero,
+                      minVerticalPadding: 14,
+                      title: Text(
+                        _formats[index].label,
+                        style: TextStyle(
+                          color: palette.ink,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      subtitle: Text(
+                        _formats[index].description,
+                        style: TextStyle(color: palette.secondaryInk),
+                      ),
+                      trailing: Icon(
+                        Icons.chevron_right_rounded,
+                        color: palette.secondaryInk,
+                      ),
+                      onTap: () => Navigator.pop(context, _formats[index]),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+    if (selected == null || !mounted) return;
+    final exportBaseName = await _requestExportBaseName(selected);
+    if (exportBaseName == null || !mounted) return;
+    await _export(selected, exportBaseName);
+  }
+
+  String _suggestedExportBaseName() {
+    var baseName = p
+        .basenameWithoutExtension(_sourceName)
+        .replaceAll(RegExp(r'[\\/:*?"<>|]'), '_')
+        .trim()
+        .replaceAll(RegExp(r'[. ]+$'), '');
+    if (baseName.isEmpty) baseName = 'audio';
+    if (!baseName.toLowerCase().endsWith('_cut')) {
+      baseName = '${baseName}_cut';
+    }
+    return baseName;
+  }
+
+  String? _normalizeExportBaseName(String raw) {
+    var baseName = raw.trim();
+    final extension = p.extension(baseName).toLowerCase();
+    if (_formats.any((format) => extension == '.${format.extension}')) {
+      baseName = baseName.substring(0, baseName.length - extension.length);
+    }
+    baseName = baseName.trim().replaceAll(RegExp(r'[. ]+$'), '');
+    if (baseName.isEmpty || RegExp(r'[\\/:*?"<>|]').hasMatch(baseName)) {
+      return null;
+    }
+    return baseName;
+  }
+
+  Future<String?> _requestExportBaseName(_ExportFormat format) async {
+    final palette = _EditorPalette.of(context);
+    final controller = TextEditingController(text: _suggestedExportBaseName());
+    String? validationMessage;
+    final result = await showCupertinoDialog<String>(
+      context: context,
+      builder: (dialogContext) => CupertinoTheme(
+        data: CupertinoThemeData(
+          brightness: Theme.of(dialogContext).brightness,
+          primaryColor: palette.accent,
+        ),
+        child: StatefulBuilder(
+          builder: (dialogContext, setDialogState) {
+            void submit() {
+              final baseName = _normalizeExportBaseName(controller.text);
+              if (baseName == null) {
+                setDialogState(() {
+                  validationMessage = '请输入文件名，且不要包含路径或特殊字符。';
+                });
+                return;
+              }
+              Navigator.pop(dialogContext, baseName);
+            }
+
+            return CupertinoAlertDialog(
+              title: const Text('自定义导出文件名'),
+              content: Padding(
+                padding: const EdgeInsets.only(top: 14),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    CupertinoTextField(
+                      controller: controller,
+                      autofocus: true,
+                      textInputAction: TextInputAction.done,
+                      style: TextStyle(color: palette.ink, fontSize: 17),
+                      placeholder: '输入文件名',
+                      placeholderStyle: TextStyle(
+                        color: palette.secondaryInk,
+                        fontSize: 15,
+                      ),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 12,
+                      ),
+                      decoration: BoxDecoration(
+                        color: palette.secondarySurface,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      suffix: Padding(
+                        padding: const EdgeInsets.only(right: 12),
+                        child: Text(
+                          '.${format.extension}',
+                          style: TextStyle(
+                            color: palette.secondaryInk,
+                            fontSize: 15,
+                          ),
+                        ),
+                      ),
+                      onChanged: (_) {
+                        if (validationMessage != null) {
+                          setDialogState(() => validationMessage = null);
+                        }
+                      },
+                      onSubmitted: (_) => submit(),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      '将导出为 ${format.label}，扩展名会自动添加。',
+                      style: TextStyle(
+                        color: palette.secondaryInk,
+                        fontSize: 13,
+                      ),
+                    ),
+                    if (validationMessage != null) ...[
+                      const SizedBox(height: 8),
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          validationMessage ?? '',
+                          style: TextStyle(color: palette.accent, fontSize: 13),
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+              actions: [
+                CupertinoDialogAction(
+                  onPressed: () => Navigator.pop(dialogContext),
+                  child: const Text('取消'),
+                ),
+                CupertinoDialogAction(
+                  isDefaultAction: true,
+                  onPressed: submit,
+                  child: const Text('导出'),
                 ),
               ],
-            ],
-          ),
+            );
+          },
         ),
       ),
     );
-    if (selected != null) await _export(selected);
+    controller.dispose();
+    return result;
   }
 
-  Future<void> _export(_ExportFormat format) async {
+  Future<void> _export(_ExportFormat format, String exportBaseName) async {
     final source = _sourcePath;
     if (source == null) return;
-    final baseName = p
-        .basenameWithoutExtension(_sourceName)
-        .replaceAll(RegExp(r'[^\p{L}\p{N}._ -]', unicode: true), '_');
-    final suggestedName = '${baseName}_cut.${format.extension}';
+    final exportName = '$exportBaseName.${format.extension}';
     if (!mounted) return;
 
     setState(() {
@@ -605,12 +765,14 @@ class _EditorScreenState extends State<_EditorScreen> {
     });
     try {
       final directory = _workDirectory ?? await _workDirectoryFuture;
-      final output = File(
+      final exportDirectory = Directory(
         p.join(
           directory.path,
-          '${DateTime.now().microsecondsSinceEpoch}_$suggestedName',
+          'export_${DateTime.now().microsecondsSinceEpoch}',
         ),
       );
+      await exportDirectory.create(recursive: true);
+      final output = File(p.join(exportDirectory.path, exportName));
       final outputPath = output.path;
 
       final arguments = <String>[
@@ -639,7 +801,7 @@ class _EditorScreenState extends State<_EditorScreen> {
       await SharePlus.instance.share(
         ShareParams(
           title: '保存剪辑音频',
-          subject: suggestedName,
+          subject: exportName,
           files: [XFile(outputPath, mimeType: _mimeType(format.extension))],
         ),
       );
@@ -661,6 +823,57 @@ class _EditorScreenState extends State<_EditorScreen> {
     ScaffoldMessenger.of(context)
       ..hideCurrentSnackBar()
       ..showSnackBar(SnackBar(content: Text(message)));
+  }
+
+  void _showPrivacyPolicy() {
+    final palette = _EditorPalette.of(context);
+    final maxContentHeight = math.min(
+      MediaQuery.sizeOf(context).height * .56,
+      440.0,
+    );
+    unawaited(
+      showCupertinoDialog<void>(
+        context: context,
+        builder: (dialogContext) => CupertinoTheme(
+          data: CupertinoThemeData(
+            brightness: Theme.of(dialogContext).brightness,
+            primaryColor: palette.accent,
+          ),
+          child: CupertinoAlertDialog(
+            title: const Text('隐私政策'),
+            content: SizedBox(
+              height: maxContentHeight,
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.only(top: 14),
+                child: Text(
+                  _inAppPrivacyPolicy,
+                  textAlign: TextAlign.left,
+                  style: TextStyle(
+                    color: palette.secondaryInk,
+                    fontSize: 14,
+                    height: 1.5,
+                  ),
+                ),
+              ),
+            ),
+            actions: [
+              CupertinoDialogAction(
+                onPressed: () {
+                  Navigator.pop(dialogContext);
+                  showLicensePage(context: context, applicationName: '本地音剪');
+                },
+                child: const Text('开源许可'),
+              ),
+              CupertinoDialogAction(
+                isDefaultAction: true,
+                onPressed: () => Navigator.pop(dialogContext),
+                child: const Text('关闭'),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
   String _friendlyError(Object error) {
@@ -691,25 +904,27 @@ class _EditorScreenState extends State<_EditorScreen> {
         title: const Text('本地音剪'),
         actions: [
           Padding(
-            padding: const EdgeInsets.only(right: 20),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  Icons.lock_outline_rounded,
-                  size: 16,
+            padding: const EdgeInsets.only(right: 8),
+            child: TextButton.icon(
+              onPressed: _showPrivacyPolicy,
+              icon: Icon(
+                Icons.lock_outline_rounded,
+                size: 16,
+                color: palette.secondaryInk,
+              ),
+              label: Text(
+                '仅本机',
+                style: TextStyle(
                   color: palette.secondaryInk,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w500,
                 ),
-                const SizedBox(width: 5),
-                Text(
-                  '仅本机',
-                  style: TextStyle(
-                    color: palette.secondaryInk,
-                    fontSize: 13,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ],
+              ),
+              style: TextButton.styleFrom(
+                minimumSize: const Size(48, 44),
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              ),
             ),
           ),
         ],
