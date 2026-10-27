@@ -43,7 +43,7 @@
 - 顶栏“仅本机”可打开完整的应用内隐私说明；同时提供 Flutter 依赖开源许可列表。
 - 商店资料草稿、Data safety 草稿和逐项发布清单位于 `docs/google-play/`。
 - `docs/` 包含轻量项目主页和中英文隐私政策，供 GitHub Pages 发布；公开的隐私政策链接是 Play Console 必填项。
-- Google Play 图标和 feature graphic 由 `tooling/generate_google_play_assets.swift` 生成；Android/iOS 启动图标由 `tooling/update_launcher_icons.sh` 导出。
+- Google Play 图标和 feature graphic 由 `tooling/generate_google_play_assets.swift` 生成；Android/iOS 启动图标由 `tooling/update_launcher_icons.sh` 导出。统一使用浅薄荷底 `#EAF7EF`、微信绿 `#07C160` 和选区浅绿 `#B4ECCE`。
 - Android release 固定使用 target API 36；release 构建必须使用本机上传密钥，不使用 debug 签名。
 - 本机处理的音频不应被描述为上传数据；用户主动通过系统分享面板选择的目标由该目标的隐私规则负责。
 

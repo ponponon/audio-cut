@@ -99,10 +99,10 @@ private func makeAppIcon(at url: URL) throws {
     let heights: [CGFloat] = [118, 176, 252, 184, 324, 424, 286, 210, 358, 448, 300, 226, 372, 420, 276, 172, 118]
 
     try writePNG(width: 1024, height: 1024, to: url) { context in
-        context.setFillColor(color(0x16452F))
+        context.setFillColor(color(0xEAF7EF))
         context.fill(CGRect(x: 0, y: 0, width: side, height: side))
 
-        context.setFillColor(color(0x2B8053, alpha: 0.7))
+        context.setFillColor(color(0xB4ECCE, alpha: 0.8))
         context.addPath(roundedRect(CGRect(x: 370, y: 232, width: 284, height: 560), radius: 142))
         context.fillPath()
 
@@ -112,13 +112,13 @@ private func makeAppIcon(at url: URL) throws {
             heights: heights,
             barWidth: 22,
             gap: 20,
-            color: color(0xF4F7F4),
+            color: color(0x07C160),
             selectedRange: 5...11,
-            selectedColor: color(0xD4F0DC)
+            selectedColor: color(0x38CD7F)
         )
 
         for x: CGFloat in [366, 658] {
-            context.setFillColor(color(0xB9E8CA))
+            context.setFillColor(color(0x07C160))
             context.addPath(roundedRect(CGRect(x: x, y: 224, width: 16, height: 576), radius: 8))
             context.fillPath()
             context.addPath(roundedRect(CGRect(x: x - 18, y: 220, width: 52, height: 24), radius: 12))
@@ -167,11 +167,11 @@ private func makeFeatureGraphic(at url: URL) throws {
         )
         badge.draw(at: CGPoint(x: 100, y: 151))
 
-        context.setFillColor(color(0x16452F))
+        context.setFillColor(color(0xEAF7EF))
         context.addPath(roundedRect(CGRect(x: 630, y: 50, width: 330, height: 400), radius: 38))
         context.fillPath()
 
-        context.setFillColor(color(0x2B8053, alpha: 0.72))
+        context.setFillColor(color(0xB4ECCE, alpha: 0.85))
         context.addPath(roundedRect(CGRect(x: 754, y: 126, width: 108, height: 248), radius: 54))
         context.fillPath()
 
@@ -181,13 +181,13 @@ private func makeFeatureGraphic(at url: URL) throws {
             heights: [50, 72, 98, 132, 174, 120, 86, 150, 188, 126, 84, 142, 176, 112, 76, 54],
             barWidth: 10,
             gap: 7,
-            color: color(0xF4F7F4),
+            color: color(0x07C160),
             selectedRange: 5...10,
-            selectedColor: color(0xD4F0DC)
+            selectedColor: color(0x38CD7F)
         )
 
         for x: CGFloat in [748, 852] {
-            context.setFillColor(color(0xB9E8CA))
+            context.setFillColor(color(0x07C160))
             context.addPath(roundedRect(CGRect(x: x, y: 112, width: 8, height: 276), radius: 4))
             context.fillPath()
             context.addPath(roundedRect(CGRect(x: x - 8, y: 108, width: 24, height: 13), radius: 6.5))
