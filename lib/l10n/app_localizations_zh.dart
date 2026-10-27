@@ -15,6 +15,33 @@ class AppLocalizationsZh extends AppLocalizations {
   String get appName => '本地音剪';
 
   @override
+  String get settingsTitle => '设置';
+
+  @override
+  String get settingsLanguage => '应用语言';
+
+  @override
+  String get settingsLanguageHint => '选择本应用显示的语言。';
+
+  @override
+  String get systemDefaultLanguage => '跟随系统';
+
+  @override
+  String get languageChineseSimplified => '简体中文';
+
+  @override
+  String get languageEnglish => 'English';
+
+  @override
+  String get languageJapanese => '日本語';
+
+  @override
+  String get languageKorean => '한국어';
+
+  @override
+  String get settingsSaveFailed => '无法保存语言设置，请重试。';
+
+  @override
   String get localOnly => '仅本机';
 
   @override

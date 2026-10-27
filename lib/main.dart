@@ -162,8 +162,48 @@ const _formats = <_ExportFormat>[
   ]),
 ];
 
-class LocalAudioCutApp extends StatelessWidget {
+class LocalAudioCutApp extends StatefulWidget {
   const LocalAudioCutApp({super.key});
+
+  @override
+  State<LocalAudioCutApp> createState() => _LocalAudioCutAppState();
+}
+
+class _LocalAudioCutAppState extends State<LocalAudioCutApp> {
+  Locale? _locale;
+
+  @override
+  void initState() {
+    super.initState();
+    unawaited(_restoreLocalePreference());
+  }
+
+  Future<void> _restoreLocalePreference() async {
+    try {
+      final directory = await getApplicationSupportDirectory();
+      final preferenceFile = File(p.join(directory.path, 'locale.preference'));
+      if (!await preferenceFile.exists()) return;
+      final languageCode = (await preferenceFile.readAsString()).trim();
+      final locale = _localeForLanguageCode(languageCode);
+      if (mounted && locale != null) setState(() => _locale = locale);
+    } catch (_) {
+      // Keep following the system language if the local preference is unreadable.
+    }
+  }
+
+  Future<void> _setLocale(Locale? locale) async {
+    if (locale != null && !AppLocalizations.supportedLocales.contains(locale)) {
+      throw ArgumentError.value(locale, 'locale', 'Unsupported app locale');
+    }
+    final directory = await getApplicationSupportDirectory();
+    final preferenceFile = File(p.join(directory.path, 'locale.preference'));
+    if (locale == null) {
+      if (await preferenceFile.exists()) await preferenceFile.delete();
+    } else {
+      await preferenceFile.writeAsString(locale.languageCode, flush: true);
+    }
+    if (mounted) setState(() => _locale = locale);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -173,15 +213,19 @@ class LocalAudioCutApp extends StatelessWidget {
       themeMode: ThemeMode.system,
       theme: _buildTheme(_EditorPalette.light, Brightness.light),
       darkTheme: _buildTheme(_EditorPalette.dark, Brightness.dark),
+      locale: _locale,
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
-      home: const _EditorScreen(),
+      home: _EditorScreen(locale: _locale, onLocaleChanged: _setLocale),
     );
   }
 }
 
 class _EditorScreen extends StatefulWidget {
-  const _EditorScreen();
+  const _EditorScreen({required this.locale, required this.onLocaleChanged});
+
+  final Locale? locale;
+  final Future<void> Function(Locale?) onLocaleChanged;
 
   @override
   State<_EditorScreen> createState() => _EditorScreenState();
@@ -867,6 +911,99 @@ class _EditorScreenState extends State<_EditorScreen> {
     );
   }
 
+  Future<void> _showSettings() async {
+    final palette = _EditorPalette.of(context);
+    await showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: palette.surface,
+      showDragHandle: true,
+      isScrollControlled: true,
+      builder: (sheetContext) {
+        final l10n = AppLocalizations.of(sheetContext);
+        final maxSheetHeight = MediaQuery.sizeOf(sheetContext).height * .82;
+        final options = <_LanguageOption>[
+          _LanguageOption(null, l10n.systemDefaultLanguage),
+          _LanguageOption(const Locale('zh'), l10n.languageChineseSimplified),
+          _LanguageOption(const Locale('en'), l10n.languageEnglish),
+          _LanguageOption(const Locale('ja'), l10n.languageJapanese),
+          _LanguageOption(const Locale('ko'), l10n.languageKorean),
+        ];
+        return SafeArea(
+          child: ConstrainedBox(
+            constraints: BoxConstraints(maxHeight: maxSheetHeight),
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.fromLTRB(20, 4, 20, 20),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    l10n.settingsTitle,
+                    style: TextStyle(
+                      color: palette.ink,
+                      fontSize: 20,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    l10n.settingsLanguage,
+                    style: TextStyle(
+                      color: palette.ink,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    l10n.settingsLanguageHint,
+                    style: TextStyle(color: palette.secondaryInk),
+                  ),
+                  const SizedBox(height: 8),
+                  for (final option in options)
+                    _languageOptionTile(option, l10n, palette, sheetContext),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _languageOptionTile(
+    _LanguageOption option,
+    AppLocalizations l10n,
+    _EditorPalette palette,
+    BuildContext sheetContext,
+  ) {
+    final selected = widget.locale == option.locale;
+    return ListTile(
+      contentPadding: EdgeInsets.zero,
+      minVerticalPadding: 10,
+      selected: selected,
+      title: Text(
+        option.label,
+        style: TextStyle(
+          color: selected ? palette.accent : palette.ink,
+          fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
+        ),
+      ),
+      trailing: Icon(
+        selected ? Icons.check_circle_rounded : Icons.radio_button_unchecked,
+        color: selected ? palette.accent : palette.secondaryInk,
+      ),
+      onTap: () async {
+        try {
+          await widget.onLocaleChanged(option.locale);
+          if (sheetContext.mounted) Navigator.pop(sheetContext);
+        } catch (_) {
+          if (mounted) _showMessage(l10n.settingsSaveFailed);
+        }
+      },
+    );
+  }
+
   String _friendlyError(Object error) {
     if (error is FormatException) return error.message;
     if (error is FileSystemException && error.message.isNotEmpty) {
@@ -917,6 +1054,12 @@ class _EditorScreenState extends State<_EditorScreen> {
                 tapTargetSize: MaterialTapTargetSize.shrinkWrap,
               ),
             ),
+          ),
+          IconButton(
+            tooltip: _l10n.settingsTitle,
+            onPressed: _showSettings,
+            icon: const Icon(Icons.settings_outlined),
+            color: palette.secondaryInk,
           ),
         ],
       ),
@@ -1562,6 +1705,21 @@ class _ExportFormat {
   final String extension;
   final List<String> codecArguments;
 }
+
+class _LanguageOption {
+  const _LanguageOption(this.locale, this.label);
+
+  final Locale? locale;
+  final String label;
+}
+
+Locale? _localeForLanguageCode(String languageCode) => switch (languageCode) {
+  'zh' => const Locale('zh'),
+  'en' => const Locale('en'),
+  'ja' => const Locale('ja'),
+  'ko' => const Locale('ko'),
+  _ => null,
+};
 
 String _durationText(Duration duration) {
   final totalMilliseconds = duration.inMilliseconds;

@@ -15,6 +15,34 @@ class AppLocalizationsEn extends AppLocalizations {
   String get appName => 'Audio Cut';
 
   @override
+  String get settingsTitle => 'Settings';
+
+  @override
+  String get settingsLanguage => 'App language';
+
+  @override
+  String get settingsLanguageHint => 'Choose the language used in this app.';
+
+  @override
+  String get systemDefaultLanguage => 'System default';
+
+  @override
+  String get languageChineseSimplified => '简体中文';
+
+  @override
+  String get languageEnglish => 'English';
+
+  @override
+  String get languageJapanese => '日本語';
+
+  @override
+  String get languageKorean => '한국어';
+
+  @override
+  String get settingsSaveFailed =>
+      'Could not save your language preference. Try again.';
+
+  @override
   String get localOnly => 'On this device';
 
   @override

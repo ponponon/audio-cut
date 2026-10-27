@@ -15,6 +15,33 @@ class AppLocalizationsJa extends AppLocalizations {
   String get appName => '音声カット';
 
   @override
+  String get settingsTitle => '設定';
+
+  @override
+  String get settingsLanguage => 'アプリの言語';
+
+  @override
+  String get settingsLanguageHint => 'アプリで使用する言語を選択します。';
+
+  @override
+  String get systemDefaultLanguage => 'システム設定に従う';
+
+  @override
+  String get languageChineseSimplified => '简体中文';
+
+  @override
+  String get languageEnglish => 'English';
+
+  @override
+  String get languageJapanese => '日本語';
+
+  @override
+  String get languageKorean => '한국어';
+
+  @override
+  String get settingsSaveFailed => '言語設定を保存できませんでした。もう一度お試しください。';
+
+  @override
   String get localOnly => 'この端末内のみ';
 
   @override

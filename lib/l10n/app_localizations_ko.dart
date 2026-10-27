@@ -15,6 +15,33 @@ class AppLocalizationsKo extends AppLocalizations {
   String get appName => '오디오 컷';
 
   @override
+  String get settingsTitle => '설정';
+
+  @override
+  String get settingsLanguage => '앱 언어';
+
+  @override
+  String get settingsLanguageHint => '앱에서 사용할 언어를 선택하세요.';
+
+  @override
+  String get systemDefaultLanguage => '시스템 기본값';
+
+  @override
+  String get languageChineseSimplified => '简体中文';
+
+  @override
+  String get languageEnglish => 'English';
+
+  @override
+  String get languageJapanese => '日本語';
+
+  @override
+  String get languageKorean => '한국어';
+
+  @override
+  String get settingsSaveFailed => '언어 설정을 저장할 수 없습니다. 다시 시도해 주세요.';
+
+  @override
   String get localOnly => '이 기기에서만';
 
   @override
