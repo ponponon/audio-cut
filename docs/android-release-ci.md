@@ -31,6 +31,8 @@ GitHub 接收后只显示 secret 名称，不能重新读取其值。不要用 `
 
 官网 `/download` 只重定向到 `https://audio-cut-releases.quniv.cn`，APK 本体不应放在京东云 OpenResty 源站。每次 Release 会保存不可变的版本对象 `releases/<version>/android/arm64-v8a/audio-cut-<version>-arm64-v8a.apk`，并覆盖 `releases/latest/android/arm64-v8a/audio-cut-latest-arm64-v8a.apk`。latest 对象和清单的 R2 缓存头为 60 秒，版本对象与版本清单使用一年不可变缓存。`quniv.cn` 区域的 Cloudflare Cache Rule 还需对 stable APK 与 `/manifest/latest.json` 强制设置 60 秒 Browser TTL；只查看 R2 对象元数据不足以确认用户浏览器收到的缓存头。
 
+官网直装 arm64 APK 压缩原生 `.so` 以减小下载体积；App Bundle 生成的设备 APK 不受 `useLegacyPackaging` 影响。发布后分别核对 APK 下载大小、签名、安装占用及设备行为，不能把下载体积当作安装占用。
+
 ### 凭据配置
 
 在 GitHub 仓库 `ponponon/audio-cut` 的 **Settings → Environments → r2-release** 中设置：

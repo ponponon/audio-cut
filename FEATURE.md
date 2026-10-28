@@ -12,6 +12,7 @@
 ## Android 发布架构
 
 - Android 官方 APK 仅打包并支持 `arm64-v8a`；构建配置需排除 ARM32、x86 和 x86_64 原生库。
+- 官网直装 APK 使用 Android Gradle Plugin 的 `useLegacyPackaging` 压缩 `.so` 原生库，降低下载体积；此 APK 打包选项不改变 Google Play App Bundle 生成的设备 APK。
 - 包名固定为 `cn.quniv.audio_cut`。跨官网、应用商店和直装版本升级时保持同一应用签名密钥。
 - 上传密钥或应用签名私钥、密码不得提交 Git、公开网站或 R2；R2 可存放公开 APK 和真实应用截图。
 

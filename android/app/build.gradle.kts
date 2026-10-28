@@ -42,6 +42,14 @@ android {
         versionName = flutter.versionName
     }
 
+    // Compress native libraries in the standalone website APK to reduce downloads.
+    // This does not configure APKs generated from an App Bundle.
+    packagingOptions {
+        jniLibs {
+            useLegacyPackaging = true
+        }
+    }
+
     if (releaseSigningConfigured) {
         signingConfigs {
             create("release") {

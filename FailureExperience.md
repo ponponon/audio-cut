@@ -53,3 +53,9 @@
 - 错误：配置 R2 GitHub Actions 时没有先检查用户已提供的 `CLOUDFLARE_ACCOUNT_ID`、`CLOUDFLARE_API_TOKEN`、`R2_ACCESS_KEY_ID` 和 `R2_SECRET_ACCESS_KEY`，因此额外创建了一枚 R2 token。
 - 处理：通过不输出凭据值的方式确认本机已有 R2 S3 凭据，并用只读检查和临时对象写入/删除验证目标桶权限；把现有 `R2_ACCESS_KEY_ID`、`R2_SECRET_ACCESS_KEY` 更新到 GitHub `r2-release` Secrets 后，撤销本次多创建的 token。
 - 经验：创建云端凭据前先检查已有环境变量和 GitHub Secret 名称；区分 Wrangler 使用的 Cloudflare API token 与 S3 兼容 API 使用的 R2 Access Key/Secret。只有现有凭据缺失或权限不匹配时才创建新凭据，并且不要输出、提交任何凭据值。
+
+## 2026-10-28：官网直装 APK 要单独检查原生库压缩策略
+
+- 错误：分析 39.8 MB APK 时只看到 `.so` 在 ZIP 中未压缩，误以为进一步压缩空间有限，漏掉了 Android Gradle Plugin 的 `useLegacyPackaging`。
+- 处理：对现有 APK 的 13 个 arm64 `.so` 做 DEFLATE 6 模拟后，估算整个 APK 可从约 39.8 MB 降至约 19.4 MB。实际构建的 0.1.3 APK 为 19,337,565 字节，比 0.1.2 少 20,460,524 字节（约 51.4%）。该选项会在安装时解压原生库，下载变小但设备安装占用增加；直接 APK 与 App Bundle 生成包的行为需分开检查。
+- 经验：讨论 APK 体积时要区分下载体积、安装占用和安装耗时，并核对 `useLegacyPackaging`、App Bundle 与 16 KB 页面大小要求；不要只凭 ZIP 当前压缩状态推断没有低风险优化。
