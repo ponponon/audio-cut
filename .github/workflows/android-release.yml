@@ -4,11 +4,16 @@ on:
   release:
     types: [published]
   workflow_dispatch:
+    inputs:
+      publish_release_tag:
+        description: "Optional published release tag to attach this signed build to and publish to R2"
+        required: false
+        type: string
 
 permissions: {}
 
 concurrency:
-  group: android-release-${{ github.event.release.tag_name || github.ref }}
+  group: android-release-${{ github.event.release.tag_name || inputs.publish_release_tag || github.ref }}
   cancel-in-progress: false
 
 jobs:
@@ -26,6 +31,7 @@ jobs:
       - name: Check out source
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          ref: ${{ inputs.publish_release_tag || github.ref }}
           fetch-depth: 0
           persist-credentials: false
 
@@ -47,7 +53,7 @@ jobs:
         id: version
         shell: bash
         env:
-          RELEASE_TAG: ${{ github.event.release.tag_name || '' }}
+          RELEASE_TAG: ${{ github.event.release.tag_name || inputs.publish_release_tag || '' }}
         run: |
           set -euo pipefail
           FULL_VERSION="$(sed -n 's/^version:[[:space:]]*//p' pubspec.yaml | tr -d "'\"" | head -n 1)"
@@ -61,12 +67,16 @@ jobs:
             echo "Could not read a numeric Android version code from pubspec.yaml." >&2
             exit 1
           fi
-          if [[ "$GITHUB_EVENT_NAME" == "release" ]]; then
+          if [[ -n "$RELEASE_TAG" ]]; then
             if [[ "$RELEASE_TAG" != "v$APP_VERSION" ]]; then
               echo "Release tag $RELEASE_TAG must match pubspec version v$APP_VERSION." >&2
               exit 1
             fi
-            git merge-base --is-ancestor "$GITHUB_SHA" origin/main || {
+            RELEASE_COMMIT="$(git rev-parse --verify "${RELEASE_TAG}^{commit}")" || {
+              echo "Release tag $RELEASE_TAG does not resolve to a commit." >&2
+              exit 1
+            }
+            git merge-base --is-ancestor "$RELEASE_COMMIT" origin/main || {
               echo "Release source must already be present in origin/main." >&2
               exit 1
             }
@@ -186,7 +196,7 @@ jobs:
           retention-days: 90
 
   publish:
-    if: github.event_name == 'release'
+    if: github.event_name == 'release' || (github.event_name == 'workflow_dispatch' && inputs.publish_release_tag != '')
     needs: build
     runs-on: ubuntu-24.04
     permissions:
@@ -201,11 +211,11 @@ jobs:
       - name: Attach APK and App Bundle to GitHub Release
         env:
           GH_TOKEN: ${{ github.token }}
-          RELEASE_TAG: ${{ github.event.release.tag_name }}
-        run: gh release upload "$RELEASE_TAG" release-assets/* --clobber
+          RELEASE_TAG: ${{ github.event.release.tag_name || inputs.publish_release_tag }}
+        run: gh release upload "$RELEASE_TAG" release-assets/* --clobber --repo "$GITHUB_REPOSITORY"
 
   publish_r2:
-    if: github.event_name == 'release'
+    if: github.event_name == 'release' || (github.event_name == 'workflow_dispatch' && inputs.publish_release_tag != '')
     needs: [build, publish]
     runs-on: ubuntu-24.04
     environment: r2-release

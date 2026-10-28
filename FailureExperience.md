@@ -59,3 +59,9 @@
 - 错误：分析 39.8 MB APK 时只看到 `.so` 在 ZIP 中未压缩，误以为进一步压缩空间有限，漏掉了 Android Gradle Plugin 的 `useLegacyPackaging`。
 - 处理：对现有 APK 的 13 个 arm64 `.so` 做 DEFLATE 6 模拟后，估算整个 APK 可从约 39.8 MB 降至约 19.4 MB。实际构建的 0.1.3 APK 为 19,337,565 字节，比 0.1.2 少 20,460,524 字节（约 51.4%）。该选项会在安装时解压原生库，下载变小但设备安装占用增加；直接 APK 与 App Bundle 生成包的行为需分开检查。
 - 经验：讨论 APK 体积时要区分下载体积、安装占用和安装耗时，并核对 `useLegacyPackaging`、App Bundle 与 16 KB 页面大小要求；不要只凭 ZIP 当前压缩状态推断没有低风险优化。
+
+## 2026-10-29：GitHub Release 标签发布需要匹配环境规则和 CLI 仓库上下文
+
+- 现象：手动签名构建通过，但发布标签触发的 build 因 `android-release` 环境只允许 `main` 和 `v*` 分支、未允许 `v*` 标签而被拒绝；放行标签后，附件 job 又因没有 checkout 仓库而无法运行 `gh release upload`。
+- 处理：保留 `main` 限制并为签名环境添加 `v*` 标签策略；Release 上传命令显式传入 `--repo "$GITHUB_REPOSITORY"`。同时给 `workflow_dispatch` 增加可选的已存在 Release 标签输入，默认仍只构建 artifact，只有明确填写标签才会发布。
+- 经验：GitHub Release 的 `GITHUB_REF` 是标签，环境规则需要将 tag 与 branch 分开配置；只下载 artifact 的 job 不应假定有 `.git` 仓库，调用 `gh` 时显式提供 `--repo`。Release 失败后不要改写已有远程标签，应通过受校验的发布恢复入口继续上传。
