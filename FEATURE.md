@@ -18,7 +18,7 @@
 ## 官网与下载
 
 - 官网地址为 `https://audio-cut.quniv.cn`，使用静态页面介绍开源、免费、纯本地、无广告的产品定位，并提供隐私政策、真实应用截图和 arm64 Android APK。官网页面由 OpenResty 提供；APK 存储在 Cloudflare R2 `audio-cut-releases`，通过 `https://audio-cut-releases.quniv.cn` 自定义域名下载，官网 `/download` 只负责重定向，不从小带宽源站传输 APK。
-- GitHub Release 发布后，`publish_r2` 任务把已签名 APK、版本化清单和 latest 清单上传到 R2，并刷新稳定 latest APK 对象。latest 下载与清单通过 Cloudflare Cache Rule 设置 60 秒 Browser TTL，版本化对象保持一年不可变缓存。R2 凭据单独存放在 `r2-release` GitHub Actions 环境，只授予 `audio-cut-releases` 桶的对象读写权限，不与 Android 签名密钥共用环境。
+- GitHub Release 发布后，`publish_r2` 任务把已签名 APK、版本化清单和 latest 清单上传到 R2，并刷新稳定 latest APK 对象。latest 下载与清单通过 Cloudflare Cache Rule 设置 60 秒 Browser TTL，版本化对象保持一年不可变缓存。R2 S3 凭据单独存放在 `r2-release` GitHub Actions 环境，不与 Android 签名密钥共用环境；凭据不得提交到代码仓库。
 - 官网不加载第三方统计、广告、字体或脚本，不接收音频文件，也不提供云端音频处理。
 - 真实截图从实际运行的 Android 应用捕获；商店截图需满足目标商店的尺寸和长宽比要求。
 

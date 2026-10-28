@@ -31,17 +31,15 @@ GitHub 接收后只显示 secret 名称，不能重新读取其值。不要用 `
 
 官网 `/download` 只重定向到 `https://audio-cut-releases.quniv.cn`，APK 本体不应放在京东云 OpenResty 源站。每次 Release 会保存不可变的版本对象 `releases/<version>/android/arm64-v8a/audio-cut-<version>-arm64-v8a.apk`，并覆盖 `releases/latest/android/arm64-v8a/audio-cut-latest-arm64-v8a.apk`。latest 对象和清单的 R2 缓存头为 60 秒，版本对象与版本清单使用一年不可变缓存。`quniv.cn` 区域的 Cloudflare Cache Rule 还需对 stable APK 与 `/manifest/latest.json` 强制设置 60 秒 Browser TTL；只查看 R2 对象元数据不足以确认用户浏览器收到的缓存头。
 
-### 首次配置
-
-在 Cloudflare R2 为 `audio-cut-releases` 创建一个 API token：权限选 **Object Read & Write**，范围只选这个 bucket。不要选 Admin，也不要复用 Wrangler 的全账户 token。该 token 仅通过 S3 兼容 API 使用。
+### 凭据配置
 
 在 GitHub 仓库 `ponponon/audio-cut` 的 **Settings → Environments → r2-release** 中设置：
 
-- Secret `R2_ACCESS_KEY_ID`：R2 token 的 Access Key ID。
-- Secret `R2_SECRET_ACCESS_KEY`：R2 token 的 Secret Access Key。
-- Variable `CLOUDFLARE_ACCOUNT_ID`：R2 Overview 中的 Account ID。
+- Secret `R2_ACCESS_KEY_ID`：复用本机已有的同名环境变量。
+- Secret `R2_SECRET_ACCESS_KEY`：复用本机已有的同名环境变量。
+- Variable `CLOUDFLARE_ACCOUNT_ID`：复用本机已有的同名环境变量。
 
-本项目已为 `r2-release` 环境配置上述 Account ID，并保存了 bucket 范围的上传密钥。该 Cloudflare token 有效期为一年；到期前创建新的同权限 token、替换两个 Secrets，再撤销旧 token。Android 签名密钥仍仅存在于 `android-release` 环境。
+本项目的 `r2-release` GitHub Actions 环境已复用这些现有值。上传任务使用 AWS CLI 访问 R2 的 S3 兼容 API，因此需要 `R2_ACCESS_KEY_ID`、`R2_SECRET_ACCESS_KEY` 和 Account ID；`CLOUDFLARE_API_TOKEN` 用于 Wrangler/Cloudflare API 操作，不由当前上传任务读取。设置 Secret 时不得把值打印到日志、写入文件或提交到 Git。复用前先确认凭据能访问目标桶，并尽量采用满足任务所需的最小权限。Android 签名密钥仍仅存在于 `android-release` 环境。
 
 ### 自动发布
 

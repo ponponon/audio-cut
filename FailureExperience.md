@@ -47,3 +47,9 @@
 - 原因：`quniv.cn` 区域原有 Browser Cache TTL 会覆盖源站下发给浏览器的缓存时长。单看 R2 元数据无法确认最终用户收到的缓存策略。
 - 处理：为 `audio-cut-releases.quniv.cn` 上的 stable APK 和 `/manifest/latest.json` 新增 Cloudflare Cache Rule，强制 Browser TTL 为 1 分钟；边缘缓存继续尊重 R2 对象缓存头。通过官网 `/download` 发起 Range 请求，确认最终响应为 `206` 且 `Cache-Control: public, max-age=60`。
 - 经验：凡是经 CDN 分发会覆盖更新的稳定 URL，都要沿真实公开入口验证最终响应头，不能只检查对象存储元数据；版本化不可变对象与 stable alias 应采用不同缓存策略。
+
+## 2026-10-28：先复用现有 Cloudflare 凭据，再决定是否新建
+
+- 错误：配置 R2 GitHub Actions 时没有先检查用户已提供的 `CLOUDFLARE_ACCOUNT_ID`、`CLOUDFLARE_API_TOKEN`、`R2_ACCESS_KEY_ID` 和 `R2_SECRET_ACCESS_KEY`，因此额外创建了一枚 R2 token。
+- 处理：通过不输出凭据值的方式确认本机已有 R2 S3 凭据，并用只读检查和临时对象写入/删除验证目标桶权限；把现有 `R2_ACCESS_KEY_ID`、`R2_SECRET_ACCESS_KEY` 更新到 GitHub `r2-release` Secrets 后，撤销本次多创建的 token。
+- 经验：创建云端凭据前先检查已有环境变量和 GitHub Secret 名称；区分 Wrangler 使用的 Cloudflare API token 与 S3 兼容 API 使用的 R2 Access Key/Secret。只有现有凭据缺失或权限不匹配时才创建新凭据，并且不要输出、提交任何凭据值。
