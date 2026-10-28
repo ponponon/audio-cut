@@ -1,12 +1,14 @@
 # 项目约定
 
+- 项目定位为开源、免费、纯本地、无广告的音频剪辑器；Android 正式发布仅支持 `arm64-v8a`。官网只展示产品信息、隐私政策、真实截图并分发 APK，不接入账号、音频上传、云处理、广告或分析。
 - 本应用的音频解码、预览、剪切和导出全部在设备本地完成。不得新增登录、云同步、上传、广告、远程分析或音频相关网络请求。
 - 只通过系统文件选择器读取用户主动选中的文件；应用不得申请不必要的存储、麦克风或网络权限。
 - 修改 UI 前，先检查目标组件源码、同类控件实现、图标定义和设计 token；检查后再实现，完成后核对视觉一致性。
 - 开始 UI 设计前阅读 `PRODUCT.md` 和 `DESIGN.md`，并保持实现与已确认的产品方向、无障碍规范一致。
 - 应用图标是用户已确认的锁定品牌资产：浅薄荷底 `#EAF7EF`、微信绿 `#07C160` 的波形与剪辑手柄、选区浅绿 `#B4ECCE`。除用户明确要求修改 logo 外，不得改变其造型、配色、背景或比例；生成平台尺寸时只从已确认的母版导出。
 - 开始开发前阅读 `FEATURE.md` 和 `FailureExperience.md`。
-- Android 发布前阅读 `docs/google-play/release-checklist.md`；上传密钥和 `key.properties` 只能留在本机安全备份，不能提交到 Git。
+- Android 发布前阅读 `docs/google-play/release-checklist.md`；上传/应用签名密钥和 `key.properties` 只能留在本机安全备份，不能提交到 Git 或上传到 R2。
+- Android release 使用 Flutter Gradle `defaultConfig.ndk.abiFilters` 清空默认 ABI 后只添加 `arm64-v8a`；不要用单纯的 `+=` 保留 Flutter 默认多架构，也不要与 `--split-per-abi` 混用。
 - 音频处理依赖本机运行，不得因发布接入远程处理、统计或广告 SDK；隐私政策和 Data safety 声明必须与实际 release 包一致。
 
 每次新增加功能，都要加到 FEATURE.md 里面，为什么要这样做？为了以后可以换一个 AI 的时候，可以从 0 到 1 重新创建
@@ -14,3 +16,5 @@
 每次我指正出来的错误，得到的经验都要加到 FailureExperience.md 文件里面，避免再次犯错
 
 且记得阅读 FEATURE.md 和 FailureExperience.md，方便了解项目的上下文
+
+每次完成一个代码任务后，先审查本次变更并确认没有密钥、密码、APK/AAB、构建产物或缓存，再将任务相关的代码、文档和必要素材创建为独立 Git commit；无需另行询问是否提交。除非用户明确要求，否则不要推送到远程仓库。

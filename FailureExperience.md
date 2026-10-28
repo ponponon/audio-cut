@@ -26,3 +26,4 @@
 - Flutter 模板可能让 Android release 沿用 debug 签名；正式包必须明确使用上传密钥，并将私钥及密码排除在 Git 之外。
 - Play 对隐私政策和 Data safety 的要求也适用于不收集数据的应用。隐私政策既要有公开网页，也要在应用内提供链接或文本；Play Console 声明必须基于最终 release 包和全部依赖。
 - 商店素材不能沿用 Flutter 模板的默认图标。截图必须来自真实运行的应用，不能用营销图或概念图代替。
+- Flutter 3.35 之后会默认把 armeabi-v7a、arm64-v8a 和 x86_64 加入 Android ABI 过滤器。只支持 arm64 时，`defaultConfig.ndk.abiFilters` 必须先 `clear()` 再添加 `arm64-v8a`；只用 `+=` 会保留 Flutter 自动加入的其他架构。自定义 `ndk.abiFilters` 时也不要同时传 `--split-per-abi`。

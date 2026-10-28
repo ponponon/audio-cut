@@ -29,6 +29,7 @@
 
 - Flutter stable 3.47.x（Dart 3.13.x）。
 - Android：Android SDK / JDK 17，最低 API 24（FFmpeg 音频插件要求）。
+- Android 发布包仅支持 `arm64-v8a`。
 - iOS：Xcode，首版最低 iOS 15。
 
 在安装 Flutter 的终端中运行：
@@ -54,4 +55,8 @@ flutter run
 
 ## Google Play 发布
 
-发布前材料和操作步骤见 [`docs/google-play/release-checklist.md`](docs/google-play/release-checklist.md)。首次发布需要在本机生成并安全备份 Android 上传密钥，然后构建已签名的 App Bundle。隐私政策网页位于 `docs/privacy-policy.html`；启用 GitHub Pages 后，将其公开 URL 填入 Play Console。
+发布前材料和操作步骤见 [`docs/google-play/release-checklist.md`](docs/google-play/release-checklist.md)。官网提供免登录 APK 下载和真实应用截图；首次发布需要在本机生成并安全备份 Android 签名密钥，然后构建已签名的 App Bundle。跨官网和商店分发时，Play App Signing 也应使用自己的应用签名密钥，避免用户在不同渠道安装后无法原位升级。隐私政策网页位于 `docs/privacy-policy.html`，官网也会提供公开访问入口。
+
+## 官网
+
+产品介绍、隐私政策和 Android arm64 APK 下载见 [audio-cut.quniv.cn](https://audio-cut.quniv.cn)。官网使用静态页面，不接入广告、分析或音频上传。

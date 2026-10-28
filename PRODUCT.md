@@ -10,7 +10,7 @@ People who want to trim audio from a personal device library and care that their
 
 ## Product Purpose
 
-本地音剪 is a cross-platform Android and iOS audio editor. It imports a file selected by the user, previews its waveform, lets the user choose exact in/out points, auditions the selection, and exports a common audio format. Audio decoding and editing happen on the device; the app has no account, automatic cloud sync, or audio upload.
+本地音剪 is a free, open-source, ad-free cross-platform Android and iOS audio editor. It imports a file selected by the user, previews its waveform, lets the user choose exact in/out points, auditions the selection, and exports a common audio format. Audio decoding and editing happen on the device; the app has no account, automatic cloud sync, or audio upload. Android release builds support arm64-v8a only.
 
 ## Brand Personality
 

@@ -1,0 +1,19 @@
+{
+  "name": "本地音剪",
+  "packageName": "cn.quniv.audio_cut",
+  "versionName": "0.1.2",
+  "versionCode": 2003,
+  "minimumAndroidVersion": "7.0",
+  "minimumAndroidApi": 24,
+  "supportedAbis": ["arm64-v8a"],
+  "file": "/downloads/audio-cut-0.1.2-arm64-v8a.apk",
+  "sizeBytes": 39798089,
+  "sha256": "62889942d6c40d34898585f57f579d8735c1a7d87e0da36900296d49f48ff128",
+  "signingCertificateSha256": "c2e95cb4e32afd9bc17bc21a8067f9f3f29e5ffe8dca1f8a764ad8c388204daf",
+  "updated": "2026-10-28",
+  "screenshots": [
+    "/assets/screenshots/home.jpg",
+    "/assets/screenshots/editor-range.jpg",
+    "/assets/screenshots/export-formats.jpg"
+  ]
+}
