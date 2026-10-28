@@ -46,7 +46,7 @@ FLUTTER_SUPPRESS_ANALYTICS=true /private/tmp/audio_cut_flutter_sdk/flutter/bin/f
 - `ANDROID_RELEASE_STORE_PASSWORD`：keystore 密码。
 - `ANDROID_RELEASE_KEY_PASSWORD`：签名条目密码。
 
-工作流只在发布事件或 `main` 分支的手动运行中读取这些 Secrets；外部 fork 的 Pull Request 不会触发签名任务。签名任务只有 `contents: read` 权限；发布任务不接触签名密钥，只将构建产物附加到已发布的 GitHub Release。当前工作流不会自动上传 Play Console 或 R2。GitHub Secrets 是云端签名凭据，不是备份；本机加密备份仍须保留。
+工作流只在发布事件或 `main` 分支的手动运行中读取这些 Secrets；外部 fork 的 Pull Request 不会触发签名任务。签名任务只有 `contents: read` 权限；独立的发布任务不接触签名密钥，只将构建产物附加到已发布的 GitHub Release。正式 Release 发布后，`publish_r2` 会使用单独的 `r2-release` 环境 Secrets 将 APK 和版本清单上传到 R2；它不会上传 Google Play。GitHub Secrets 是云端签名凭据，不是备份；本机加密备份仍须保留。
 
 本应用计划同时通过官网和安卓应用商店分发，因此应在 Play App Signing 设置时选择提供自己的应用签名密钥，使 Google Play 与官网/OEM 安装包使用同一个应用签名证书。Google 也允许让其生成并保管应用签名密钥；若采用该选项，官网和其他商店必须使用 Play Console 导出的 Play 签名通用 APK，否则相同包名的不同签名无法原位升级。当前仓库生成的本地密钥既可用作自有应用签名密钥，也可直接用作上传密钥；若后续选择分离 upload key，应同步调整 Gradle 签名配置。
 

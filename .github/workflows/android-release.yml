@@ -20,6 +20,8 @@ jobs:
       contents: read
     outputs:
       version_name: ${{ steps.version.outputs.name }}
+      version_code: ${{ steps.version.outputs.code }}
+      signing_certificate_sha256: ${{ steps.signatures.outputs.certificate_sha256 }}
     steps:
       - name: Check out source
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -50,8 +52,13 @@ jobs:
           set -euo pipefail
           FULL_VERSION="$(sed -n 's/^version:[[:space:]]*//p' pubspec.yaml | tr -d "'\"" | head -n 1)"
           APP_VERSION="${FULL_VERSION%%+*}"
-          if [[ -z "$APP_VERSION" ]]; then
+          if [[ -z "$APP_VERSION" || "$FULL_VERSION" != *+* ]]; then
             echo "Could not read the app version from pubspec.yaml." >&2
+            exit 1
+          fi
+          APP_VERSION_CODE="${FULL_VERSION##*+}"
+          if [[ ! "$APP_VERSION_CODE" =~ ^[0-9]+$ ]]; then
+            echo "Could not read a numeric Android version code from pubspec.yaml." >&2
             exit 1
           fi
           if [[ "$GITHUB_EVENT_NAME" == "release" ]]; then
@@ -65,6 +72,7 @@ jobs:
             }
           fi
           echo "name=$APP_VERSION" >> "$GITHUB_OUTPUT"
+          echo "code=$APP_VERSION_CODE" >> "$GITHUB_OUTPUT"
 
       - name: Restore signing files
         shell: bash
@@ -98,6 +106,7 @@ jobs:
           flutter build appbundle --no-pub --release
 
       - name: Verify signatures and arm64-only payload
+        id: signatures
         shell: bash
         run: |
           set -euo pipefail
@@ -110,6 +119,10 @@ jobs:
           APKSIGNER="$(find "$SDK_ROOT/build-tools" -type f -name apksigner | sort -V | tail -n 1)"
           test -n "$APKSIGNER"
           "$APKSIGNER" verify "$APK"
+          CERTIFICATE_SHA256="$("$APKSIGNER" verify --print-certs "$APK" \
+            | awk -F': ' '/Signer #1 certificate SHA-256 digest:/ {print tolower($2)}')"
+          test -n "$CERTIFICATE_SHA256"
+          echo "certificate_sha256=$CERTIFICATE_SHA256" >> "$GITHUB_OUTPUT"
           jarsigner -verify "$AAB" >/dev/null
           APK_CONTENTS="$(unzip -Z1 "$APK")"
           AAB_CONTENTS="$(unzip -Z1 "$AAB")"
@@ -167,3 +180,109 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           RELEASE_TAG: ${{ github.event.release.tag_name }}
         run: gh release upload "$RELEASE_TAG" release-assets/* --clobber
+
+  publish_r2:
+    if: github.event_name == 'release'
+    needs: [build, publish]
+    runs-on: ubuntu-24.04
+    environment: r2-release
+    permissions:
+      contents: read
+    steps:
+      - name: Check out release metadata
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Download signed APK artifact
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: audio-cut-android-${{ needs.build.outputs.version_name }}
+          path: release-assets
+
+      - name: Publish versioned and latest APKs and manifests to R2
+        shell: bash
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: auto
+          AWS_EC2_METADATA_DISABLED: 'true'
+          CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+          APP_VERSION_NAME: ${{ needs.build.outputs.version_name }}
+          APP_VERSION_CODE: ${{ needs.build.outputs.version_code }}
+          SIGNING_CERTIFICATE_SHA256: ${{ needs.build.outputs.signing_certificate_sha256 }}
+        run: |
+          set -euo pipefail
+          : "${AWS_ACCESS_KEY_ID:?Missing R2_ACCESS_KEY_ID in the r2-release environment}"
+          : "${AWS_SECRET_ACCESS_KEY:?Missing R2_SECRET_ACCESS_KEY in the r2-release environment}"
+          : "${CLOUDFLARE_ACCOUNT_ID:?Missing CLOUDFLARE_ACCOUNT_ID in the r2-release environment}"
+          : "${APP_VERSION_NAME:?Missing release version name}"
+          : "${APP_VERSION_CODE:?Missing release version code}"
+          : "${SIGNING_CERTIFICATE_SHA256:?Missing signing certificate fingerprint}"
+
+          APK="release-assets/audio-cut-${APP_VERSION_NAME}-arm64-v8a.apk"
+          test -f "$APK"
+          APK_SIZE_BYTES="$(stat -c '%s' "$APK")"
+          APK_SHA256="$(sha256sum "$APK" | awk '{print $1}')"
+          R2_BUCKET='audio-cut-releases'
+          R2_ENDPOINT="https://${CLOUDFLARE_ACCOUNT_ID}.r2.cloudflarestorage.com"
+          VERSIONED_KEY="releases/${APP_VERSION_NAME}/android/arm64-v8a/audio-cut-${APP_VERSION_NAME}-arm64-v8a.apk"
+          LATEST_KEY='releases/latest/android/arm64-v8a/audio-cut-latest-arm64-v8a.apk'
+          VERSIONED_URL="https://audio-cut-releases.quniv.cn/${VERSIONED_KEY}"
+
+          mkdir -p release-manifests
+          jq \
+            --arg versionName "$APP_VERSION_NAME" \
+            --argjson versionCode "$APP_VERSION_CODE" \
+            --arg file "$VERSIONED_URL" \
+            --argjson sizeBytes "$APK_SIZE_BYTES" \
+            --arg sha256 "$APK_SHA256" \
+            --arg signingCertificateSha256 "$SIGNING_CERTIFICATE_SHA256" \
+            --arg updated "$(date -u +%F)" \
+            '.versionName = $versionName
+             | .versionCode = $versionCode
+             | .file = $file
+             | .sizeBytes = $sizeBytes
+             | .sha256 = $sha256
+             | .signingCertificateSha256 = $signingCertificateSha256
+             | .updated = $updated' \
+            website/releases/latest.json > release-manifests/latest.json
+          cp release-manifests/latest.json \
+            "release-manifests/${APP_VERSION_NAME}.json"
+
+          aws s3 cp "$APK" "s3://${R2_BUCKET}/${VERSIONED_KEY}" \
+            --endpoint-url "$R2_ENDPOINT" \
+            --content-type 'application/vnd.android.package-archive' \
+            --content-disposition "attachment; filename=\"audio-cut-${APP_VERSION_NAME}-arm64-v8a.apk\"" \
+            --cache-control 'public, max-age=31536000, immutable'
+          aws s3 cp "release-manifests/${APP_VERSION_NAME}.json" \
+            "s3://${R2_BUCKET}/manifest/${APP_VERSION_NAME}.json" \
+            --endpoint-url "$R2_ENDPOINT" \
+            --content-type 'application/json; charset=utf-8' \
+            --cache-control 'public, max-age=31536000, immutable'
+
+          aws s3 cp "$APK" "s3://${R2_BUCKET}/${LATEST_KEY}" \
+            --endpoint-url "$R2_ENDPOINT" \
+            --content-type 'application/vnd.android.package-archive' \
+            --content-disposition "attachment; filename=\"audio-cut-${APP_VERSION_NAME}-arm64-v8a.apk\"" \
+            --cache-control 'public, max-age=60'
+          aws s3 cp release-manifests/latest.json \
+            "s3://${R2_BUCKET}/manifest/latest.json" \
+            --endpoint-url "$R2_ENDPOINT" \
+            --content-type 'application/json; charset=utf-8' \
+            --cache-control 'public, max-age=60'
+
+          VERSIONED_SIZE="$(aws s3api head-object \
+            --bucket "$R2_BUCKET" \
+            --key "$VERSIONED_KEY" \
+            --endpoint-url "$R2_ENDPOINT" \
+            --query ContentLength \
+            --output text)"
+          LATEST_SIZE="$(aws s3api head-object \
+            --bucket "$R2_BUCKET" \
+            --key "$LATEST_KEY" \
+            --endpoint-url "$R2_ENDPOINT" \
+            --query ContentLength \
+            --output text)"
+          test "$VERSIONED_SIZE" = "$APK_SIZE_BYTES"
+          test "$LATEST_SIZE" = "$APK_SIZE_BYTES"

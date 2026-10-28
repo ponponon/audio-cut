@@ -40,3 +40,10 @@
 - 补正：较早保存在 Redmi 上的 APK 哈希错误、签名摘要和 ZIP CRC 校验失败；随后在 Redmi Chrome 中从官网直接重新下载的 APK 与正式包 SHA-256 均为 `62889942d6c40d34898585f7f579d8735c1a7d87e0da36900296d49f48ff128`，签名和 ZIP 校验通过，用户确认现在可正常安装。较早文件的损坏原因尚未确定。
 - 错误：用户要求验证官网实际下载时，曾把 Mac 本地 APK 通过 ADB 传到手机，测试路径不符合要求。之后必须在目标手机浏览器/商店直接下载；若只用 ADB 打开安装器，明确说明 ADB 只启动了安装动作，不能把它冒充成下载验证。
 - 错误：APK 虽已存在 `audio-cut-releases` R2 桶，官网 `/download` 仍从 OpenResty 小带宽源站发送 APK，造成约 5 MB/s 的速度上限；且 R2 对象初始 `Cache-Control` 为 `private, max-age=0, no-cache`。对象在 R2 里不等于下载流量走 R2，发布前必须沿官网按钮检查最终跳转域名、Cloudflare 缓存响应头和对象 SHA-256。
+
+## 2026-10-28：R2 对象缓存头不等于浏览器实际缓存时长
+
+- 现象：stable APK 在 R2 中设置了 `Cache-Control: public, max-age=60`，但经过 Cloudflare 自定义域名的响应仍返回 `max-age=14400`。
+- 原因：`quniv.cn` 区域原有 Browser Cache TTL 会覆盖源站下发给浏览器的缓存时长。单看 R2 元数据无法确认最终用户收到的缓存策略。
+- 处理：为 `audio-cut-releases.quniv.cn` 上的 stable APK 和 `/manifest/latest.json` 新增 Cloudflare Cache Rule，强制 Browser TTL 为 1 分钟；边缘缓存继续尊重 R2 对象缓存头。通过官网 `/download` 发起 Range 请求，确认最终响应为 `206` 且 `Cache-Control: public, max-age=60`。
+- 经验：凡是经 CDN 分发会覆盖更新的稳定 URL，都要沿真实公开入口验证最终响应头，不能只检查对象存储元数据；版本化不可变对象与 stable alias 应采用不同缓存策略。
