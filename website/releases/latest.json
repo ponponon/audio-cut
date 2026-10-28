@@ -6,7 +6,7 @@
   "minimumAndroidVersion": "7.0",
   "minimumAndroidApi": 24,
   "supportedAbis": ["arm64-v8a"],
-  "file": "/downloads/audio-cut-0.1.2-arm64-v8a.apk",
+  "file": "https://audio-cut-releases.quniv.cn/releases/0.1.2/android/arm64-v8a/audio-cut-0.1.2-arm64-v8a.apk",
   "sizeBytes": 39798089,
   "sha256": "62889942d6c40d34898585f57f579d8735c1a7d87e0da36900296d49f48ff128",
   "signingCertificateSha256": "c2e95cb4e32afd9bc17bc21a8067f9f3f29e5ffe8dca1f8a764ad8c388204daf",

@@ -27,4 +27,10 @@ GitHub 接收后只显示 secret 名称，不能重新读取其值。不要用 `
 - Pull Request 不会获得签名 Secrets；签名任务使用 `contents: read`，上传 Release 资产的独立任务才获得 `contents: write`。
 - 工作流只构建并发布 GitHub Release 资产；不会自动上传 Google Play 或 R2。
 
+## 官网 R2 分发
+
+官网 `/download` 只重定向到 `https://audio-cut-releases.quniv.cn`，APK 本体不应放在京东云 OpenResty 源站。当前版本对象位于 `audio-cut-releases/releases/0.1.2/android/arm64-v8a/audio-cut-0.1.2-arm64-v8a.apk`。
+
+发布新版本时，将已签名 APK 上传到 `audio-cut-releases/releases/<version>/android/arm64-v8a/`，并设置 `Content-Type: application/vnd.android.package-archive`、`Content-Disposition: attachment`、`Cache-Control: public, max-age=31536000, immutable`。同步更新 R2 的 `manifest/<version>.json`、`manifest/latest.json`、网站的 `website/releases/latest.json` 和 OpenResty `/download` 重定向。最后沿官网 `/download` 检查 302 的目标域名、APK SHA-256，以及最终 GET 的 `Server: cloudflare` 和 `CF-Cache-Status: HIT`。
+
 应用签名私钥可用于官网直装 APK 的更新校验，应长期保护。若后续在 Play App Signing 中另生成 upload key，应分别配置并更新 CI 流程，保持官网安装包和 Play 用户端签名关系正确。
