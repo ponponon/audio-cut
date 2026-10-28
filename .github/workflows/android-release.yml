@@ -120,9 +120,18 @@ jobs:
           test -n "$APKSIGNER"
           "$APKSIGNER" verify "$APK"
           echo "APK signature verified."
-          CERTIFICATE_SHA256="$("$APKSIGNER" verify --print-certs "$APK" \
-            | awk -F': ' '/Signer #1 certificate SHA-256 digest:/ {print tolower($2)}')"
-          test -n "$CERTIFICATE_SHA256"
+          if ! CERTIFICATE_OUTPUT="$("$APKSIGNER" verify --print-certs "$APK" 2>&1)"; then
+            echo "Could not read the APK signer certificate fingerprint." >&2
+            exit 1
+          fi
+          CERTIFICATE_SHA256="$(awk -F'digest:[[:space:]]*' \
+            'tolower($1) ~ /certificate sha-256/ {digest=tolower($2); gsub(/:/, "", digest); gsub(/[[:space:]\r]/, "", digest); print digest}' \
+            <<< "$CERTIFICATE_OUTPUT")"
+          if [[ ! "$CERTIFICATE_SHA256" =~ ^[0-9a-f]{64}$ ]]; then
+            echo "Could not parse a 64-character SHA-256 signer fingerprint from apksigner output." >&2
+            exit 1
+          fi
+          echo "APK signer certificate fingerprint parsed."
           echo "certificate_sha256=$CERTIFICATE_SHA256" >> "$GITHUB_OUTPUT"
           jarsigner -verify "$AAB" >/dev/null
           echo "App Bundle signature verified."
