@@ -119,23 +119,37 @@ jobs:
           APKSIGNER="$(find "$SDK_ROOT/build-tools" -type f -name apksigner | sort -V | tail -n 1)"
           test -n "$APKSIGNER"
           "$APKSIGNER" verify "$APK"
+          echo "APK signature verified."
           CERTIFICATE_SHA256="$("$APKSIGNER" verify --print-certs "$APK" \
             | awk -F': ' '/Signer #1 certificate SHA-256 digest:/ {print tolower($2)}')"
           test -n "$CERTIFICATE_SHA256"
           echo "certificate_sha256=$CERTIFICATE_SHA256" >> "$GITHUB_OUTPUT"
           jarsigner -verify "$AAB" >/dev/null
+          echo "App Bundle signature verified."
           APK_CONTENTS="$(unzip -Z1 "$APK")"
           AAB_CONTENTS="$(unzip -Z1 "$AAB")"
-          grep -q '^lib/arm64-v8a/' <<< "$APK_CONTENTS"
-          grep -q '^base/lib/arm64-v8a/' <<< "$AAB_CONTENTS"
+          if ! grep -q '^lib/arm64-v8a/' <<< "$APK_CONTENTS"; then
+            echo "APK does not contain arm64-v8a native libraries." >&2
+            grep '^lib/' <<< "$APK_CONTENTS" | head -n 20 >&2 || true
+            exit 1
+          fi
+          if ! grep -q '^base/lib/arm64-v8a/' <<< "$AAB_CONTENTS"; then
+            echo "App Bundle does not contain arm64-v8a native libraries." >&2
+            grep '^base/lib/' <<< "$AAB_CONTENTS" | head -n 20 >&2 || true
+            exit 1
+          fi
+          echo "APK and App Bundle contain arm64-v8a native libraries."
           if grep -Eq '^lib/(armeabi-v7a|x86|x86_64)/' <<< "$APK_CONTENTS"; then
             echo "APK contains a non-arm64 native library." >&2
+            grep -E '^lib/(armeabi-v7a|x86|x86_64)/' <<< "$APK_CONTENTS" | head -n 20 >&2 || true
             exit 1
           fi
           if grep -Eq '^base/lib/(armeabi-v7a|x86|x86_64)/' <<< "$AAB_CONTENTS"; then
             echo "App Bundle contains a non-arm64 native library." >&2
+            grep -E '^base/lib/(armeabi-v7a|x86|x86_64)/' <<< "$AAB_CONTENTS" | head -n 20 >&2 || true
             exit 1
           fi
+          echo "Only arm64-v8a native libraries are packaged."
 
       - name: Prepare release files
         shell: bash
