@@ -57,6 +57,8 @@ flutter run
 
 发布前材料和操作步骤见 [`docs/google-play/release-checklist.md`](docs/google-play/release-checklist.md)。官网提供免登录 APK 下载和真实应用截图；首次发布需要在本机生成并安全备份 Android 签名密钥，然后构建已签名的 App Bundle。跨官网和商店分发时，Play App Signing 也应使用自己的应用签名密钥，避免用户在不同渠道安装后无法原位升级。隐私政策网页位于 `docs/privacy-policy.html`，官网也会提供公开访问入口。
 
+签名构建可通过 GitHub Actions 在云端完成。将签名材料配置到 `android-release` 环境 Secrets 后，发布与 `pubspec.yaml` 版本一致的 GitHub Release 标签即可构建 APK/AAB；详细说明见 [`docs/android-release-ci.md`](docs/android-release-ci.md)。
+
 ## 官网
 
 产品介绍、隐私政策和 Android arm64 APK 下载见 [audio-cut.quniv.cn](https://audio-cut.quniv.cn)。官网使用静态页面，不接入广告、分析或音频上传。

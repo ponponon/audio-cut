@@ -14,10 +14,10 @@
 - [x] 截图由一加手机上的实际应用捕获；Play Console 版位于 `docs/google-play/screenshots/`，原比例展示版位于 `website/assets/screenshots/`。
 - [x] Android 仅支持 arm64-v8a；发布前检查 AAB/APK 的原生库架构。
 - [x] 官网及隐私政策通过 HTTPS 公开访问：`https://audio-cut.quniv.cn` 与 `https://audio-cut.quniv.cn/privacy-policy.html`。
-- [x] 生成正式本地签名密钥，并在本机保留忽略 Git 的密钥文件和加密备份。
+- [x] 生成正式签名密钥；本机保留忽略 Git 的密钥文件和加密备份，GitHub Actions 使用环境级 Secrets 签名。
 - [ ] 发布人选择并填写 Play Console 公开联系邮箱。
-- [ ] 完成 Google Play 开发者身份验证；账号目前显示 Google 正在验证身份。
-- [ ] 使用 Play Console 生成并检查最终 `.aab`；实际上传仍需等待开发者身份验证通过。
+- [x] Google Play 开发者身份验证已完成；其他账号和发布待办以 Play Console 为准。
+- [ ] 通过 GitHub Actions 生成并检查最终 `.aab`；正式上传前完成 Play Console 其他待办。
 
 ## 生成上传密钥并构建
 
@@ -34,7 +34,19 @@ APK 产物路径：`build/app/outputs/flutter-apk/app-release.apk`（需确认�
 FLUTTER_SUPPRESS_ANALYTICS=true /private/tmp/audio_cut_flutter_sdk/flutter/bin/flutter build apk --release --target-platform android-arm64
 ```
 
-网站/OEM 渠道的直装 APK 使用本地签名密钥。脚本会在 `android/` 下创建 `upload-keystore.jks` 和 `key.properties`；两者已被 Git 忽略。把密钥与密码一起放入加密备份或密码管理器，绝不能提交到 GitHub 或 R2。
+网站/OEM 渠道的直装 APK 使用应用签名密钥。脚本会在 `android/` 下创建 `upload-keystore.jks` 和 `key.properties`；两者已被 Git 忽略。密钥和密码保留加密备份；绝不能提交到 Git 仓库或上传到 R2。经用户授权后，CI 可将它们存入 GitHub Actions 的环境级 Secrets。
+
+## GitHub Actions 云端签名
+
+`.github/workflows/android-release.yml` 在 GitHub Release 发布后使用 GitHub 托管的 Linux runner 构建签名 APK 和 AAB；也可从 GitHub Actions 页面手动运行 `workflow_dispatch`，手动运行只生成可下载的 Actions artifact。手动运行时选择 `main` 分支。Release 标签必须与 `pubspec.yaml` 的版本名一致，例如 `v0.1.2`。
+
+签名私钥使用 GitHub Actions 环境 `android-release` 的 Secrets，不能设为仓库普通文件或提交进 Git：
+
+- `ANDROID_RELEASE_KEYSTORE_BASE64`：`upload-keystore.jks` 的单行 Base64。
+- `ANDROID_RELEASE_STORE_PASSWORD`：keystore 密码。
+- `ANDROID_RELEASE_KEY_PASSWORD`：签名条目密码。
+
+工作流只在发布事件或 `main` 分支的手动运行中读取这些 Secrets；外部 fork 的 Pull Request 不会触发签名任务。签名任务只有 `contents: read` 权限；发布任务不接触签名密钥，只将构建产物附加到已发布的 GitHub Release。当前工作流不会自动上传 Play Console 或 R2。GitHub Secrets 是云端签名凭据，不是备份；本机加密备份仍须保留。
 
 本应用计划同时通过官网和安卓应用商店分发，因此应在 Play App Signing 设置时选择提供自己的应用签名密钥，使 Google Play 与官网/OEM 安装包使用同一个应用签名证书。Google 也允许让其生成并保管应用签名密钥；若采用该选项，官网和其他商店必须使用 Play Console 导出的 Play 签名通用 APK，否则相同包名的不同签名无法原位升级。当前仓库生成的本地密钥既可用作自有应用签名密钥，也可直接用作上传密钥；若后续选择分离 upload key，应同步调整 Gradle 签名配置。
 
