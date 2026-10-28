@@ -27,3 +27,10 @@
 - Play 对隐私政策和 Data safety 的要求也适用于不收集数据的应用。隐私政策既要有公开网页，也要在应用内提供链接或文本；Play Console 声明必须基于最终 release 包和全部依赖。
 - 商店素材不能沿用 Flutter 模板的默认图标。截图必须来自真实运行的应用，不能用营销图或概念图代替。
 - Flutter 3.35 之后会默认把 armeabi-v7a、arm64-v8a 和 x86_64 加入 Android ABI 过滤器。只支持 arm64 时，`defaultConfig.ndk.abiFilters` 必须先 `clear()` 再添加 `arm64-v8a`；只用 `+=` 会保留 Flutter 自动加入的其他架构。自定义 `ndk.abiFilters` 时也不要同时传 `--split-per-abi`。
+
+## 2026-10-28：小米安装报解析错误时先校验手机实际下载文件
+
+- 现象：REDMI K90 Pro Max（Android 17）安装官网 APK 时提示“解析软件包时出现问题。(33) / packageInfo is null”。
+- 原因：手机 Downloads 中的 APK 虽然大小仍为 39,798,089 字节，但 SHA-256 为 `b2fa5ede4a1deb362840ad38304b90510e187ae8a2bec077084dfb76e0dc5660`，与正式 APK 不同；APK v2 摘要和 ZIP CRC 均校验失败。官网重新下载件与仓库发布件 SHA-256 均为 `62889942d6c40d34898585f57f579d8735c1a7d87e0da36900296d49f48ff128`，签名验证通过。
+- 处理：从手机拉取用户实际下载件进行 `sha256sum`、`apksigner verify` 和 ZIP 完整性检查，再用 ADB 对比安装结果。已验证的文件能进入小米安装确认流程；小米的 ADB 安装还会返回 `INSTALL_FAILED_USER_RESTRICTED`，需由用户在设备上确认。
+- 经验：文件大小相同不能证明 APK 完整。遇到包解析异常时，先核验设备上的实际文件与发布 SHA-256，再判断 ABI、签名配置或安装器兼容性；不得因损坏的下载副本贸然重签或替换正式发布包。
