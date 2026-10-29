@@ -492,6 +492,12 @@ abstract class AppLocalizations {
   /// **'_cut'**
   String get cutSuffix;
 
+  /// No description provided for @exportCopySuffix.
+  ///
+  /// In en, this message translates to:
+  /// **'_copy'**
+  String get exportCopySuffix;
+
   /// No description provided for @privacyPolicyBody.
   ///
   /// In en, this message translates to:

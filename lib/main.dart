@@ -644,10 +644,12 @@ class _EditorScreenState extends State<_EditorScreen> {
         .replaceAll(RegExp(r'[. ]+$'), '');
     if (baseName.isEmpty) baseName = _l10n.defaultAudioName;
     final suffix = _l10n.cutSuffix;
-    if (!baseName.toLowerCase().endsWith(suffix.toLowerCase()) &&
-        !baseName.toLowerCase().endsWith('_cut')) {
-      baseName = '$baseName$suffix';
-    }
+    final alreadyHasCutSuffix = baseName.toLowerCase().endsWith(
+      suffix.toLowerCase(),
+    );
+    baseName = alreadyHasCutSuffix
+        ? '$baseName${_l10n.exportCopySuffix}'
+        : '$baseName$suffix';
     return baseName;
   }
 
