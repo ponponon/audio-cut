@@ -1,7 +1,7 @@
 name: audio_cut
 description: An offline audio trimmer for Android and iOS.
 publish_to: 'none'
-version: 0.1.4+2005
+version: 0.1.5+2006
 
 environment:
   sdk: ^3.9.0
