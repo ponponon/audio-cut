@@ -9,6 +9,11 @@ on:
         description: "Optional published release tag to attach this signed build to and publish to R2"
         required: false
         type: string
+      build_from_main:
+        description: "For recovery only: build from main if app source is unchanged since the release tag"
+        required: false
+        default: false
+        type: boolean
 
 permissions: {}
 
@@ -31,7 +36,7 @@ jobs:
       - name: Check out source
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          ref: ${{ inputs.publish_release_tag || github.ref }}
+          ref: ${{ inputs.build_from_main && github.ref || inputs.publish_release_tag || github.ref }}
           fetch-depth: 0
           persist-credentials: false
 
@@ -54,6 +59,8 @@ jobs:
         shell: bash
         env:
           RELEASE_TAG: ${{ github.event.release.tag_name || inputs.publish_release_tag || '' }}
+          BUILD_FROM_MAIN: ${{ inputs.build_from_main }}
+          TRIGGER_EVENT_NAME: ${{ github.event_name }}
         run: |
           set -euo pipefail
           FULL_VERSION="$(sed -n 's/^version:[[:space:]]*//p' pubspec.yaml | tr -d "'\"" | head -n 1)"
@@ -65,6 +72,10 @@ jobs:
           APP_VERSION_CODE="${FULL_VERSION##*+}"
           if [[ ! "$APP_VERSION_CODE" =~ ^[0-9]+$ ]]; then
             echo "Could not read a numeric Android version code from pubspec.yaml." >&2
+            exit 1
+          fi
+          if [[ "$BUILD_FROM_MAIN" == "true" && ( "$TRIGGER_EVENT_NAME" != "workflow_dispatch" || -z "$RELEASE_TAG" ) ]]; then
+            echo "Building from main is only allowed for manual recovery of an existing release." >&2
             exit 1
           fi
           if [[ -n "$RELEASE_TAG" ]]; then
@@ -80,6 +91,10 @@ jobs:
               echo "Release source must already be present in origin/main." >&2
               exit 1
             }
+            if [[ "$BUILD_FROM_MAIN" == "true" ]] && ! git diff --quiet "$RELEASE_COMMIT" HEAD -- pubspec.yaml lib android ios assets; then
+              echo "App source must be unchanged since the release tag when building a recovery from main." >&2
+              exit 1
+            fi
           fi
           echo "name=$APP_VERSION" >> "$GITHUB_OUTPUT"
           echo "code=$APP_VERSION_CODE" >> "$GITHUB_OUTPUT"

@@ -75,3 +75,10 @@
 - 现象：手动签名构建通过，但发布标签触发的 build 因 `android-release` 环境只允许 `main` 和 `v*` 分支、未允许 `v*` 标签而被拒绝；放行标签后，附件 job 又因没有 checkout 仓库而无法运行 `gh release upload`。
 - 处理：保留 `main` 限制并为签名环境添加 `v*` 标签策略；Release 上传命令显式传入 `--repo "$GITHUB_REPOSITORY"`。同时给 `workflow_dispatch` 增加可选的已存在 Release 标签输入，默认仍只构建 artifact，只有明确填写标签才会发布。
 - 经验：GitHub Release 的 `GITHUB_REF` 是标签，环境规则需要将 tag 与 branch 分开配置；只下载 artifact 的 job 不应假定有 `.git` 仓库，调用 `gh` 时显式提供 `--repo`。Release 失败后不要改写已有远程标签，应通过受校验的发布恢复入口继续上传。
+
+## 2026-10-30：严格锁定依赖时 Pub 源必须与 CI 一致
+
+- 现象：Android Release CI 使用 `flutter pub get --enforce-lockfile` 时失败，并提示 `pubspec.lock` 无法满足 `pubspec.yaml`；CI 将从 `pub.dev` 解析出 69 项变化。
+- 原因：本机设置了 `PUB_HOSTED_URL=https://pub.flutter-io.cn`，提交的锁文件记录了镜像地址和镜像当前解析的版本；GitHub Actions 使用默认 `pub.dev`，两边的 hosted source、校验和及部分版本不一致。
+- 处理：使用与 CI 相同的 Flutter 3.47.8 和 `PUB_HOSTED_URL=https://pub.dev` 运行 `flutter pub get` 更新锁文件，并用 `flutter pub get --enforce-lockfile` 确认可复现。若此问题发生在 Release 标签创建后，不要改写远程标签；手动恢复时可从 `main` 构建，但必须通过工作流校验确认应用源码目录与标签一致。
+- 经验：提交锁文件前确认 Flutter SDK 版本和 `PUB_HOSTED_URL` 与 CI 一致；不要为了绕过锁文件不一致而移除 CI 的 `--enforce-lockfile`。

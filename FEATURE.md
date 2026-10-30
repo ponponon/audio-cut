@@ -64,6 +64,7 @@
 - `docs/` 包含轻量项目主页和中英文隐私政策，供 GitHub Pages 发布；公开的隐私政策链接是 Play Console 必填项。
 - Google Play 图标和 feature graphic 由 `tooling/generate_google_play_assets.swift` 生成；Android/iOS 启动图标由 `tooling/update_launcher_icons.sh` 导出。统一使用浅薄荷底 `#EAF7EF`、微信绿 `#07C160` 和选区浅绿 `#B4ECCE`。
 - Android release 固定使用 target API 36；release 构建必须使用本机上传密钥，不使用 debug 签名。
+- GitHub Actions 支持针对已发布标签的手动恢复构建；仅在 `pubspec.yaml`、`lib/`、`android/`、`ios/` 与 `assets/` 未偏离标签源码时，才允许从 `main` 构建并更新 Release 附件和 R2 下载。
 - 本机处理的音频不应被描述为上传数据；用户主动通过系统分享面板选择的目标由该目标的隐私规则负责。
 
 ## 后续候选

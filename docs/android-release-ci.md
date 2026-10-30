@@ -23,7 +23,8 @@ GitHub 接收后只显示 secret 名称，不能重新读取其值。不要用 `
 ## 运行方式
 
 - 在 GitHub 网页创建并发布 Release，标签必须匹配 `pubspec.yaml` 的版本名，例如版本 `0.1.2+2003` 对应标签 `v0.1.2`。工作流构建 arm64 APK 和 AAB，并把两者附加到该 Release。
-- 从 **Actions → Android signed release → Run workflow** 手动运行时选择 `main`，不填写发布标签即可只生成签名 APK/AAB artifact。若要恢复发布到一个已存在的 Release，可填写与 `pubspec.yaml` 版本一致的 `publish_release_tag`；工作流会从该标签构建、附加 APK/AAB 并发布 R2。标签必须已存在，且指向 `main` 历史中的提交。
+- 从 **Actions → Android signed release → Run workflow** 手动运行时选择 `main`，不填写发布标签即可只生成签名 APK/AAB artifact。若要恢复发布到一个已存在的 Release，可填写与 `pubspec.yaml` 版本一致的 `publish_release_tag`；默认从该标签构建、附加 APK/AAB 并发布 R2。标签必须已存在，且位于 `main` 历史中。
+- 如果已有 Release 因依赖锁文件等元数据问题无法构建，可同时启用 `build_from_main`，从当前 `main` 恢复该 Release。工作流会验证 `pubspec.yaml`、`lib/`、`android/`、`ios/` 和 `assets/` 与标签代码相同；只有这些应用源码未变化时才允许继续。用相同 Flutter 版本和 CI 使用的 `pub.dev` 更新锁文件后，再运行此恢复方式；它不会改写已有远程标签。
 - Pull Request 不会获得签名 Secrets；签名任务使用 `contents: read`，上传 Release 资产的独立任务才获得 `contents: write`。
 - `android-release` 环境必须允许 `main` 分支和 `v*` 标签部署；只设置 `v*` 分支规则不会放行 GitHub Release 标签。工作流会把 APK/AAB 附加到 Release，并自动把 APK 与最新版本清单发布到 R2。工作流不会自动上传 Google Play。
 
