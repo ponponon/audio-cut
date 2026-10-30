@@ -9,6 +9,7 @@ import 'package:ffmpeg_kit_flutter_new_audio/ffmpeg_kit.dart';
 import 'package:ffmpeg_kit_flutter_new_audio/ffprobe_kit.dart';
 import 'package:ffmpeg_kit_flutter_new_audio/return_code.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
@@ -631,9 +632,10 @@ class _EditorScreenState extends State<_EditorScreen> {
       },
     );
     if (selected == null || !mounted) return;
-    final exportBaseName = await _requestExportBaseName(selected);
-    if (exportBaseName == null || !mounted) return;
-    await _export(selected, exportBaseName);
+    final request = await _requestExportBaseName(selected);
+    if (request == null || !mounted) return;
+    final (exportBaseName, exportAction) = request;
+    await _export(selected, exportBaseName, exportAction);
   }
 
   String _suggestedExportBaseName() {
@@ -677,11 +679,13 @@ class _EditorScreenState extends State<_EditorScreen> {
     return baseName;
   }
 
-  Future<String?> _requestExportBaseName(_ExportFormat format) async {
+  Future<(String, _ExportAction)?> _requestExportBaseName(
+    _ExportFormat format,
+  ) async {
     final palette = _EditorPalette.of(context);
     final controller = TextEditingController(text: _suggestedExportBaseName());
     String? validationMessage;
-    final result = await showCupertinoDialog<String>(
+    final result = await showCupertinoDialog<(String, _ExportAction)>(
       context: context,
       builder: (dialogContext) => CupertinoTheme(
         data: CupertinoThemeData(
@@ -690,7 +694,7 @@ class _EditorScreenState extends State<_EditorScreen> {
         ),
         child: StatefulBuilder(
           builder: (dialogContext, setDialogState) {
-            void submit() {
+            void submit(_ExportAction action) {
               final baseName = _normalizeExportBaseName(controller.text);
               if (baseName == null) {
                 setDialogState(() {
@@ -698,7 +702,7 @@ class _EditorScreenState extends State<_EditorScreen> {
                 });
                 return;
               }
-              Navigator.pop(dialogContext, baseName);
+              Navigator.pop(dialogContext, (baseName, action));
             }
 
             return CupertinoAlertDialog(
@@ -742,7 +746,7 @@ class _EditorScreenState extends State<_EditorScreen> {
                           setDialogState(() => validationMessage = null);
                         }
                       },
-                      onSubmitted: (_) => submit(),
+                      onSubmitted: (_) => submit(_ExportAction.save),
                     ),
                     const SizedBox(height: 8),
                     Text(
@@ -767,13 +771,17 @@ class _EditorScreenState extends State<_EditorScreen> {
               ),
               actions: [
                 CupertinoDialogAction(
-                  onPressed: () => Navigator.pop(dialogContext),
-                  child: Text(_l10n.cancel),
+                  isDefaultAction: true,
+                  onPressed: () => submit(_ExportAction.save),
+                  child: Text(_l10n.saveToDevice),
                 ),
                 CupertinoDialogAction(
-                  isDefaultAction: true,
-                  onPressed: submit,
-                  child: Text(_l10n.export),
+                  onPressed: () => submit(_ExportAction.share),
+                  child: Text(_l10n.shareAction),
+                ),
+                CupertinoDialogAction(
+                  onPressed: () => Navigator.pop(dialogContext),
+                  child: Text(_l10n.cancel),
                 ),
               ],
             );
@@ -785,7 +793,11 @@ class _EditorScreenState extends State<_EditorScreen> {
     return result;
   }
 
-  Future<void> _export(_ExportFormat format, String exportBaseName) async {
+  Future<void> _export(
+    _ExportFormat format,
+    String exportBaseName,
+    _ExportAction action,
+  ) async {
     final source = _sourcePath;
     if (source == null) return;
     final exportName = '$exportBaseName.${format.extension}';
@@ -832,15 +844,13 @@ class _EditorScreenState extends State<_EditorScreen> {
               : _l10n.audioExportFailed,
         );
       }
-      await SharePlus.instance.share(
-        ShareParams(
-          title: _l10n.shareTitle,
-          subject: exportName,
-          files: [XFile(outputPath, mimeType: _mimeType(format.extension))],
-        ),
-      );
-      if (!mounted) return;
-      _showMessage(_l10n.exportSuccess);
+      if (action == _ExportAction.save) {
+        await _saveToDevice(outputPath, exportName, format);
+      } else {
+        await _shareExport(outputPath, exportName, format);
+        if (!mounted) return;
+        _showMessage(_l10n.exportSuccess);
+      }
     } catch (error) {
       if (mounted) _showMessage(_l10n.exportFailed(_friendlyError(error)));
     } finally {
@@ -850,6 +860,45 @@ class _EditorScreenState extends State<_EditorScreen> {
           _activity = '';
         });
       }
+    }
+  }
+
+  Future<void> _shareExport(
+    String outputPath,
+    String exportName,
+    _ExportFormat format,
+  ) {
+    return SharePlus.instance.share(
+      ShareParams(
+        title: _l10n.shareTitle,
+        subject: exportName,
+        files: [XFile(outputPath, mimeType: _mimeType(format.extension))],
+      ),
+    );
+  }
+
+  Future<void> _saveToDevice(
+    String outputPath,
+    String exportName,
+    _ExportFormat format,
+  ) async {
+    try {
+      final displayPath = await _DeviceSaver.saveAudio(
+        sourcePath: outputPath,
+        fileName: exportName,
+        mimeType: _mimeType(format.extension),
+      );
+      if (!mounted) return;
+      _showMessage(
+        Platform.isIOS
+            ? _l10n.saveToDeviceSuccessFilesApp(displayPath)
+            : _l10n.saveToDeviceSuccess(displayPath),
+      );
+    } on PlatformException catch (error) {
+      if (error.code != 'permission_denied') rethrow;
+      if (!mounted) return;
+      _showMessage(_l10n.savePermissionFallbackShare);
+      await _shareExport(outputPath, exportName, format);
     }
   }
 
@@ -1706,6 +1755,27 @@ class _ExportFormat {
   final String label;
   final String extension;
   final List<String> codecArguments;
+}
+
+enum _ExportAction { save, share }
+
+class _DeviceSaver {
+  static const MethodChannel _channel = MethodChannel(
+    'cn.quniv.audio_cut/device_saver',
+  );
+
+  static Future<String> saveAudio({
+    required String sourcePath,
+    required String fileName,
+    required String mimeType,
+  }) async {
+    final displayPath = await _channel.invokeMethod<String>('saveAudio', {
+      'sourcePath': sourcePath,
+      'fileName': fileName,
+      'mimeType': mimeType,
+    });
+    return displayPath ?? fileName;
+  }
 }
 
 class _LanguageOption {

@@ -188,7 +188,10 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String get export => '导出';
+  String get saveToDevice => '保存到设备';
+
+  @override
+  String get shareAction => '分享';
 
   @override
   String get audioExportFailed => '音频导出失败。';
@@ -198,6 +201,19 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get exportSuccess => '音频已生成。可在系统分享面板中保存到设备。';
+
+  @override
+  String saveToDeviceSuccess(String path) {
+    return '已保存到 $path';
+  }
+
+  @override
+  String saveToDeviceSuccessFilesApp(String path) {
+    return '已保存到「文件」App 的应用文件夹：$path';
+  }
+
+  @override
+  String get savePermissionFallbackShare => '没有保存文件的权限，已改为打开分享面板。';
 
   @override
   String exportFailed(String error) {
@@ -224,5 +240,5 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get privacyPolicyBody =>
-      '本地音剪隐私说明\n\n本地音剪由本地音剪项目维护者开发。隐私联系渠道：GitHub 项目问题反馈页（github.com/ponponon/audio-cut/issues）。请勿在公开问题中附上私人音频或敏感信息。\n\n音频文件\n你通过系统文件选择器主动选中的音频，仅用于在本机分析、试听、剪切和转码。应用会将工作副本和导出文件放在应用的临时目录；应用下次启动时会清理该工作目录。原始文件不会被应用修改。\n\n网络与收集\n应用不设账号、广告、云同步、远程分析或崩溃上报服务，不会由本应用把音频、文件名或其他个人数据发送给开发者或服务器。应用不申请全盘存储或麦克风权限；仅通过系统文件选择器读取你选中的文件。\n\n导出与第三方应用\n导出时，应用会打开系统分享面板。只有在你主动选择接收应用或保存位置后，导出文件才会交给该目标。接收应用可能按照自己的服务规则保存或传输文件；这部分不由本地音剪控制。\n\n删除与保留\n工作文件会在应用下次启动时清理。你也可以通过系统设置清除本应用数据或卸载应用，删除本应用保留在设备内的文件。你主动交给其他应用的副本，需要在对应应用中单独管理。\n\n联系与更新\n如对隐私处理有疑问，可通过 GitHub 项目问题反馈页联系维护者。应用功能或处理方式变更时，本说明会同步更新。';
+      '本地音剪隐私说明\n\n本地音剪由本地音剪项目维护者开发。隐私联系渠道：GitHub 项目问题反馈页（github.com/ponponon/audio-cut/issues）。请勿在公开问题中附上私人音频或敏感信息。\n\n音频文件\n你通过系统文件选择器主动选中的音频，仅用于在本机分析、试听、剪切和转码。应用会将工作副本和导出文件放在应用的临时目录；应用下次启动时会清理该工作目录。原始文件不会被应用修改。\n\n网络与收集\n应用不设账号、广告、云同步、远程分析或崩溃上报服务，不会由本应用把音频、文件名或其他个人数据发送给开发者或服务器。应用不申请麦克风权限；仅通过系统文件选择器读取你选中的文件。Android 10 及以上版本保存导出文件不需要任何存储权限；Android 9 及以下版本仅在保存导出文件时申请存储权限。\n\n导出与第三方应用\n导出时，你可以选择「保存到设备」把文件写入本机 Music/AudioCut 文件夹（iPhone 上保存到「文件」App 中的应用文件夹），或打开系统分享面板交给其他应用。只有在你主动选择接收应用或保存位置后，导出文件才会交给该目标。接收应用可能按照自己的服务规则保存或传输文件；这部分不由本地音剪控制。\n\n删除与保留\n工作文件会在应用下次启动时清理；「保存到设备」写入公共文件夹的副本不会被应用清理。你也可以通过系统设置清除本应用数据或卸载应用，删除本应用保留在设备内的文件。你主动交给其他应用的副本，需要在对应应用中单独管理。\n\n联系与更新\n如对隐私处理有疑问，可通过 GitHub 项目问题反馈页联系维护者。应用功能或处理方式变更时，本说明会同步更新。';
 }

@@ -32,3 +32,6 @@ xcuserdata/
 # User-provided test media and temporary toolchains
 assets/test_cut.mp3
 .tooling/
+
+# WorkBuddy local workspace memory
+.workbuddy/

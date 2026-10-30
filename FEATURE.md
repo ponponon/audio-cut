@@ -31,10 +31,14 @@
 - 以时间输入和波形选区设置开始、结束位置。
 - 试听原音频和裁切选区。
 - 本地导出 MP3、M4A、WAV、FLAC、OGG、Opus。
-- 导出命名框默认使用“源文件名 + 本地化剪辑后缀”，已有该后缀时改加本地化副本标记，确保默认导出名不同于源文件；用户仍可编辑名称，所选格式的扩展名自动添加，取消命名会中止本次导出。
+- 导出命名框默认使用“源文件名 + 本地化剪辑后缀”，已有该后缀时改加本地化副本标记，确保默认导出名不同于源文件；用户仍可编辑名称，所选格式的扩展名自动添加。
+- 导出命名对话框提供两个并列出口：「保存到设备」和「分享」，另保留「取消」；取消命名会中止本次导出。
+- 「保存到设备」把导出文件写入文件管理器可见的公共目录：Android 存入 `Music/AudioCut/`（Android 10+ 经 MediaStore 免权限直存；Android 9 及以下申请 `WRITE_EXTERNAL_STORAGE`（manifest 限定 `maxSdkVersion="28"`）后写公共目录并触发媒体扫描），iOS 存入应用 `Documents/AudioCut/`（Info.plist 开启 `UIFileSharingEnabled` 与 `LSSupportsOpeningDocumentsInPlace`，在「文件」App 的应用文件夹中可见）。保存成功提示实际路径；同名文件自动加 ` (1)` 序号，不覆盖已有文件。Android 保存被拒权限时提示并自动回退到分享面板。
+- 「分享」打开系统分享面板（share_plus），由用户保存到 Files、系统文件提供方或其他目标；分享面板行为与首版一致。
+- 平台保存通道为自实现 MethodChannel `cn.quniv.audio_cut/device_saver`（`saveAudio`），不引入新插件；音频经流式拷贝写入，不整份读进内存。
 - UI 参考 iOS「语音备忘录」：跟随系统浅色/深色外观，支持系统动态字号，波形与剪辑范围优先呈现；使用柔和的森林绿强调色。
 - 编辑页底部导出栏使用轻量磨砂玻璃效果；以 Flutter 内置背景模糊近似液态玻璃，不引入额外渲染插件。
-- 导出先写入本机临时目录，再打开系统分享面板，让用户保存到 Files、系统文件提供方或其他目标。
+- 导出先写入本机临时目录，再按用户选择执行「保存到设备」或「分享」。
 
 ## 多语言
 
@@ -49,8 +53,8 @@
 
 - Flutter 仅负责界面与状态；FFmpeg 在端内执行解码、波形提取、剪切和编码。
 - 试听只使用本机文件路径。代码不接受远程 URL。
-- Android 发布包不保留 `INTERNET`、`ACCESS_NETWORK_STATE`、全盘存储或麦克风权限。
-- 临时副本放在应用沙盒；导出文件由系统分享面板交给用户选择目的地；临时副本可在下次启动时清理。
+- Android 发布包不保留 `INTERNET`、`ACCESS_NETWORK_STATE`、麦克风或全盘存储（`MANAGE_EXTERNAL_STORAGE`）权限；`WRITE_EXTERNAL_STORAGE` 仅声明 `maxSdkVersion="28"`，供 Android 9 及以下保存导出文件使用，Android 10+ 保存走 MediaStore 不需要任何存储权限。
+- 临时副本放在应用沙盒并在下次启动时清理；「保存到设备」写入公共目录（Android `Music/AudioCut/`、iOS 应用 Documents/AudioCut）的副本不被应用清理；「分享」由系统分享面板交给用户选择目的地。
 - 系统文件提供方可能是用户自己配置的云盘；本应用不发起上传或同步。
 
 ## Google Play 发布准备

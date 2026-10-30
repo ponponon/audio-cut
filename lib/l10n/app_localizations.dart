@@ -432,11 +432,17 @@ abstract class AppLocalizations {
   /// **'The file will be exported as {format}; its extension is added automatically.'**
   String exportAsFormat(String format);
 
-  /// No description provided for @export.
+  /// No description provided for @saveToDevice.
   ///
   /// In en, this message translates to:
-  /// **'Export'**
-  String get export;
+  /// **'Save to Device'**
+  String get saveToDevice;
+
+  /// No description provided for @shareAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Share'**
+  String get shareAction;
 
   /// No description provided for @audioExportFailed.
   ///
@@ -455,6 +461,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Audio is ready. Save it from the system share sheet.'**
   String get exportSuccess;
+
+  /// No description provided for @saveToDeviceSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved to {path}'**
+  String saveToDeviceSuccess(String path);
+
+  /// No description provided for @saveToDeviceSuccessFilesApp.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved to the app folder in the Files app: {path}'**
+  String saveToDeviceSuccessFilesApp(String path);
+
+  /// No description provided for @savePermissionFallbackShare.
+  ///
+  /// In en, this message translates to:
+  /// **'Storage permission was declined, so the share sheet was opened instead.'**
+  String get savePermissionFallbackShare;
 
   /// No description provided for @exportFailed.
   ///
@@ -501,7 +525,7 @@ abstract class AppLocalizations {
   /// No description provided for @privacyPolicyBody.
   ///
   /// In en, this message translates to:
-  /// **'Audio Cut Privacy Notice\n\nAudio Cut is maintained by the Audio Cut project. For privacy questions, contact the maintainers through the GitHub issue tracker at github.com/ponponon/audio-cut/issues. Do not include private audio or sensitive information in public issues.\n\nAudio files\nAudio that you choose through the system file picker is used only for analysis, preview, trimming, and conversion on this device. Working copies and exports are kept in the app\'s temporary directory, which is cleared when the app next starts. The original file is never modified.\n\nNetwork and data collection\nThe app has no accounts, ads, cloud sync, remote analytics, or crash reporting. It does not send audio, file names, or other personal data to the developer or any server. The app does not request broad storage or microphone access; it reads only files you select through the system picker.\n\nExports and other apps\nWhen you export, the app opens the system share sheet. The file is handed to another app or save location only after you choose that destination. A receiving app may store or transmit the file under its own policies; Audio Cut does not control that.\n\nDeletion and retention\nWorking files are cleared the next time the app starts. You can also clear the app\'s data in system settings or uninstall it to remove files retained by the app. Copies you share with other apps must be managed in those apps.\n\nContact and updates\nFor privacy questions, contact the maintainers through the GitHub issue tracker. This notice will be updated if the app\'s features or data handling change.'**
+  /// **'Audio Cut Privacy Notice\n\nAudio Cut is maintained by the Audio Cut project. For privacy questions, contact the maintainers through the GitHub issue tracker at github.com/ponponon/audio-cut/issues. Do not include private audio or sensitive information in public issues.\n\nAudio files\nAudio that you choose through the system file picker is used only for analysis, preview, trimming, and conversion on this device. Working copies and exports are kept in the app\'s temporary directory, which is cleared when the app next starts. The original file is never modified.\n\nNetwork and data collection\nThe app has no accounts, ads, cloud sync, remote analytics, or crash reporting. It does not send audio, file names, or other personal data to the developer or any server. The app does not request microphone access; it reads only files you select through the system picker. On Android 10 and later, saving an export needs no storage permission at all. On Android 9 and earlier, a storage permission is requested only when you save an export.\n\nExports and other apps\nWhen you export, you can save the file to this device\'s Music/AudioCut folder (on iPhone, to the app folder in the Files app), or open the system share sheet to hand it to another app. The file is handed to another app or save location only after you choose that destination. A receiving app may store or transmit the file under its own policies; Audio Cut does not control that.\n\nDeletion and retention\nWorking files are cleared the next time the app starts. Copies saved to the device\'s public folder are not cleared by the app. You can also clear the app\'s data in system settings or uninstall it to remove files retained by the app. Copies you share with other apps must be managed in those apps.\n\nContact and updates\nFor privacy questions, contact the maintainers through the GitHub issue tracker. This notice will be updated if the app\'s features or data handling change.'**
   String get privacyPolicyBody;
 }
 
