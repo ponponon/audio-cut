@@ -1769,12 +1769,18 @@ class _DeviceSaver {
     required String fileName,
     required String mimeType,
   }) async {
-    final displayPath = await _channel.invokeMethod<String>('saveAudio', {
-      'sourcePath': sourcePath,
-      'fileName': fileName,
-      'mimeType': mimeType,
-    });
-    return displayPath ?? fileName;
+    final result = await _channel.invokeMethod<Map<Object?, Object?>>(
+      'saveAudio',
+      {
+        'sourcePath': sourcePath,
+        'fileName': fileName,
+        'mimeType': mimeType,
+      },
+    );
+    final displayPath = result?['displayPath'];
+    return displayPath is String && displayPath.isNotEmpty
+        ? displayPath
+        : fileName;
   }
 }
 

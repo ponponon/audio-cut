@@ -57,6 +57,13 @@
 - 处理：通过不输出凭据值的方式确认本机已有 R2 S3 凭据，并用只读检查和临时对象写入/删除验证目标桶权限；把现有 `R2_ACCESS_KEY_ID`、`R2_SECRET_ACCESS_KEY` 更新到 GitHub `r2-release` Secrets 后，撤销本次多创建的 token。
 - 经验：创建云端凭据前先检查已有环境变量和 GitHub Secret 名称；区分 Wrangler 使用的 Cloudflare API token 与 S3 兼容 API 使用的 R2 Access Key/Secret。只有现有凭据缺失或权限不匹配时才创建新凭据，并且不要输出、提交任何凭据值。
 
+## 2026-10-30：MethodChannel 返回 Map 时 Dart 端不能用 invokeMethod\<String\>
+
+- 现象：真机点「保存到设备」报 `type '_Map<Object?, Object?>' is not a subtype of type 'String?' in type cast`。
+- 原因：Android/iOS 端 `result.success` 返回的是 `{"displayPath": ...}` Map（StandardMessageCodec 解码为 `Map<Object?, Object?>`），Dart 端却用 `invokeMethod<String>` 接收并强转。编译期不报错，只在真机调用时崩。
+- 处理：Dart 端改为 `invokeMethod<Map<Object?, Object?>>` 后读取 `displayPath` 字段，并对缺失/非字符串做回退。
+- 经验：MethodChannel 两端协议（返回类型）必须成对核对；native 返回 Map 就不能用 `invokeMethod<String>`。改动通道协议后必须在真机把完整调用链跑通，`flutter analyze` 和编译通过不能替代运行时验证。
+
 ## 2026-10-28：官网直装 APK 要单独检查原生库压缩策略
 
 - 错误：分析 39.8 MB APK 时只看到 `.so` 在 ZIP 中未压缩，误以为进一步压缩空间有限，漏掉了 Android Gradle Plugin 的 `useLegacyPackaging`。
